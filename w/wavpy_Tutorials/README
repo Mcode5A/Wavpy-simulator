@@ -1,0 +1,12 @@
+The auxiliary data files needed to run the tutorials can be downloaded from
+https://www.ice.csic.es/research/gold_rtr_mining/shared/tutorial_data.tar.gz
+
+$> wget https://www.ice.csic.es/research/gold_rtr_mining/shared/tutorial_data.tar.gz
+
+Uncompress the file in this directory. A subdirectory data/ will be created with
+the necessary files to run the tutorial programs.
+
+$> tar -xvvzf tutorial_data.tar.gz
+
+February, 5th, 2020.
+

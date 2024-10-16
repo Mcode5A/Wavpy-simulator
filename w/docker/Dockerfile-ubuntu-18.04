@@ -1,0 +1,10 @@
+# Installation of python3 needs to be completed in ubuntu 18.04
+FROM ubuntu:18.04
+
+WORKDIR /usr/waveform_pylib
+COPY . .
+
+RUN apt-get update && for i in $(cat requirements.txt ); do apt-get install -y $i; done && adduser --uid 1000 --no-create-home --disabled-password --quiet wavpy 
+
+
+

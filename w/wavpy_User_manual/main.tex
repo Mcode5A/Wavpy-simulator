@@ -1,0 +1,70 @@
+\documentclass[a4paper]{GPSSIDS}
+ 
+% this must be last and includes hyperref support
+\usepackage{thelastone}
+\usepackage[section]{placeins}
+\usepackage{pdfpages}
+\usepackage{eurosym}
+\usepackage{subfigure}
+\usepackage{color}
+
+\addtolength{\headsep}{1cm}
+\addtolength{\footskip}{5cm}
+
+\renewcommand{\comment}[1]{
+  \marginpar{\bf \it \tiny #1 }
+}
+\renewcommand{\nomenclature}[2]{
+  {\bf #1} & #2 \\
+}
+
+\title{wavpy v2.0: User manual}
+\author{Fran Fabra} 
+\date{30/10/2019}
+
+\version{2.0}
+\project{wavpy}
+\docid{\footnotesize{wavpy\_v2.0}}
+\approvedby{ -- }{ -- }
+\revisedby{ -- }{ -- }
+\authorisedby{ -- }{ -- }
+
+\makeindex
+
+\begin{document}
+
+\tableofcontents
+%\listoffigures
+%\listoftables
+
+\clearpage
+
+\chapter{Introduction}
+
+Rather than just a simple GNSS+R simulator, {\bf wavpy} is a set of {\it C++} classes that characterize a GNSS+R scenario. Working from a high level programming language like {\it python}, which is a user-friendly environment, a user in the GNSS+R field has a valid tool for working at a different levels in the processing chain, ranging from the characterization of certain parameters, such as the evolution of the reflectivity for a given surface as a function of the elevation angle, to a whole waveform/DDM simulation case or even analysis of real GNSS+R data.
+
+During the next chapters, this manual provides the definition of each variable and function from each of the different classes available in wavpy v1.0, as well as examples of how to work with them for a {\it python} user. In particular:
+\begin{itemize}
+\item {\bf GNSS\_composite} class: characterization of a GNSS signal. Chapter~\ref{cha:gnss}.
+\item {\bf RF\_FrontEnd} class: description of the different parameters in radio-frequency front-end. Chapter~\ref{cha:rffe}.
+\item {\bf Specular\_geometry} class: characterization of position and velocities in a GNSS+R scenario. Chapter~\ref{cha:geom}.
+\item {\bf Reflecting\_surface} class: characterization of a reflecting surface. Chapter~\ref{cha:surf}.
+\item {\bf ZaVoModel\_GNSSR} class: dedicated to waveform and DDM modelling. Chapter~\ref{cha:ZVmodel}.
+\item {\bf MRSR\_Model} class: dedicated to waveform modelling under a multiple layer scenario. Chapter~\ref{cha:MRSRmodel}.
+\item {\bf Waveform\_power} class: dedicated to analysis of GNSS+R power waveforms. Chapter~\ref{cha:wav}.
+\item {\bf Waveform\_complex\_cluster} class: dedicated to analysis of time series of GNSS+R complex waveforms. Chapter~\ref{cha:wavcom}.
+\end{itemize}
+
+\input{gnss_composite}
+\input{rf_front_end}
+\input{specular_geometry}
+\input{reflecting_surface}
+\input{ZavorotnyVoronovichModel}
+\input{MultiRaySingleRefl_model}
+\input{waveform_power}
+\input{waveform_complex}
+
+\input{references_nobib}
+
+\end{document}
+

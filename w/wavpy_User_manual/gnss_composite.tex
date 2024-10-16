@@ -1,0 +1,121 @@
+\chapter{GNSS\_composite}\label{cha:gnss}
+
+This class generates the autocorrelation function of a set of GNSS signals.\\
+
+Example of object construction with arbitrary name {\it my\_GNSS\_func}:\\
+
+\texttt{my\_GNSS\_func = wavpy.GNSS\_composite()}\\
+
+In this case, public variables and functions from object {\it my\_GNSS\_func} of class {\it GNSS\_composite} can be respectively checked/modified or called with:\\
+
+\texttt{my\_GNSS\_func.variable}\\
+
+\texttt{my\_GNSS\_func.function()}\\
+
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf lambda\_size} (integer): Number of samples of the autocorrelation function. Default value: 157
+
+\item {\bf weight\_CA} (float): Weight for the C/A code (GPS L1). Default value: 1.0
+
+\item {\bf weight\_PY} (float): Weight for the PY code (GPS L1). Default value: 1.0
+
+\item {\bf weight\_M} (float): Weight for the M code (GPS L1). Default value: 1.0
+
+\item {\bf weight\_IM} (float): Weight for the Inter-Modulation component (GPS L1). Default value: 1.0
+
+\item {\bf weight\_E1A} (float): Weight for the A code (Galileo E1). Default value: 0.0
+
+\item {\bf weight\_E1B} (float): Weight for the B code (Galileo E1). Default value: 0.0
+
+\item {\bf weight\_E1C} (float): Weight for the C code (Galileo E1). Default value: 0.0
+
+\item {\bf weight\_B1I} (float): Weight for the C code (BeiDou B1). Default value: 0.0
+
+\item {\bf weight\_L1C} (float): Weight for the L1C code (QZSS). Default value: 0.0
+
+\item {\bf frequency} (double): Frequency of the GNSS signal. Default value: 1575420000.0 (GPS L1)
+\end{itemize}
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf lambda\_func} (double, array of {\bf lambda\_size} elements): Normalized autocorrelation function stored. Default value: GPS-L1 autocorrelation function with all code components.
+
+\item {\bf sampling\_rate} (double): Sampling rate of the receiver in samples/sec. Default value: 80000000.0
+
+\item {\bf filter\_BB\_BW} (double): Base-band bandwidth of the filter applied in Hz. Default value: 12000000.0
+\end{itemize}
+
+\section{Functions}
+
+\subsection{dump\_parameters}
+
+Print relevant information about the object's content (public and private variables).\\
+
+Example:\\
+
+\texttt{my\_GNSS\_func.dump\_parameters()}\\
+
+
+\subsection{set\_instrumental\_params}
+
+Set the instrumental parameters that have to be taken into account for the computation of the autocorrelation function.\\
+
+Example:\\
+
+\texttt{my\_GNSS\_func.set\_instrumental\_params(sampling\_rate, filter\_BW, computeLambda)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf sampling\_rate} (double): Input sampling rate in samples/sec.
+\item {\bf filter\_BW} (double): Input base-band bandwidth of the filter applied in Hz.
+\item {\bf computeLambda} (char): "1" if you want to compute the autocorrelation function with this function call, or "0" if you just want to set the input parameters without computing the autocorrelation function.
+\end{itemize}
+
+
+\subsection{compute\_lambda\_func}
+
+Compute and store the autocorrelation function according to current configuration.\\
+
+Example:\\
+
+\texttt{my\_GNSS\_func.compute\_lambda\_func()}\\
+
+
+\subsection{get\_lambda\_func}
+
+Provide the range and values of the autocorrelation function internally stored.\\
+
+Example:\\
+
+\texttt{[range\_lambda, lambda\_func] = my\_GNSS\_func.get\_lambda\_func(range\_len, lambda\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf range\_len} (integer): Number of samples of the range of the autocorrelation function (it has to be equal to {\bf lambda\_size}).
+\item {\bf lambda\_len} (integer): Number of samples of the autocorrelation function (it has to be equal to {\bf lambda\_size}). 
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf range\_lambda} (double, array of size {\bf range\_len}): Range of the autocorrelation function in meters.
+\item {\bf lambda\_func} (double, array of size {\bf lambda\_len}): Normalized autocorrelation function.
+\end{itemize}
+
+
+\subsection{set\_lambda\_func}
+
+Set a given autocorrelation function.\\
+
+Example:\\
+
+\texttt{my\_GNSS\_func.set\_lambda\_func(lambda\_func)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lambda\_func} (double, array of N elements): Normalized autocorrelation function.
+\end{itemize}
+

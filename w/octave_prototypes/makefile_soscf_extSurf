@@ -1,0 +1,51 @@
+soscf: soscf.o seasurfaceFFTphase.o doint.o surf_interp.o reflcoeff.o ellipse.o zrhqr.o balanc.o hqr.o indexx.o convolution_spdf.o convlv.o realft.o four1.o 
+	gfortran -o soscf soscf.o  seasurfaceFFTphase.o doint.o surf_interp.o reflcoeff.o ellipse.o zrhqr.o balanc.o hqr.o indexx.o convolution_spdf.o convlv.o realft.o four1.o
+
+soscf_extSurf: soscf_extSurf.o doint.o surf_interp.o reflcoeff.o ellipse.o zrhqr.o balanc.o hqr.o indexx.o convolution_spdf.o convlv.o realft.o four1.o 
+	gfortran -o soscf_extSurf soscf_extSurf.o  doint.o surf_interp.o reflcoeff.o ellipse.o zrhqr.o balanc.o hqr.o indexx.o convolution_spdf.o convlv.o realft.o four1.o
+
+soscf.o: soscf.f90
+	gfortran -c soscf.f90 math_func.inc 
+
+soscf_extSurf.o: soscf_extSurf.f90
+	gfortran -c soscf_extSurf.f90 math_func.inc 
+
+seasurfaceFFTphase.o: seasurfaceFFTphase.f90
+	gfortran -c seasurfaceFFTphase.f90 math_func.inc
+
+doint.o: doint.f90
+	gfortran -c doint.f90 math_func.inc 
+
+surf_interp.o: surf_interp.f90
+	gfortran -c surf_interp.f90 math_func.inc
+
+reflcoeff.o: reflcoeff.f90
+	gfortran -c reflcoeff.f90 math_func.inc
+
+ellipse.o: ellipse.f90
+	gfortran -c ellipse.f90 math_func.inc
+
+zrhqr.o: zrhqr.f90
+	gfortran -c zrhqr.f90 math_func.inc
+
+balanc.o: balanc.f90
+	gfortran -c balanc.f90 math_func.inc
+
+hqr.o: hqr.f90
+	gfortran -c hqr.f90 math_func.inc
+
+indexx.o: indexx.f90
+	gfortran -c indexx.f90 math_func.inc
+
+convolution_spdf.o: convolution_spdf.f90
+	gfortran -c convolution_spdf.f90 math_func.inc
+
+convlv.o: convlv.f90
+	gfortran -c convlv.f90 math_func.inc
+
+realft.o: realft.f90
+	gfortran -c realft.f90 math_func.inc
+
+four1.o: four1.f90
+	gfortran -c four1.f90 math_func.inc
+

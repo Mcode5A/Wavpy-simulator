@@ -1,0 +1,596 @@
+\chapter{RF\_FrontEnd}\label{cha:rffe}
+
+This class characterizes the main aspects of a receiver front end.\\
+
+Example of object construction with arbitrary name {\it my\_receiver}:\\
+
+\texttt{my\_receiver = wavpy.RF\_FrontEnd()}\\
+
+In this case, public variables and functions from object {\it my\_receiver} of class {\it RF\_FrontEnd} can be respectively checked/modified or called with:\\
+
+\texttt{my\_receiver.variable}\\
+
+\texttt{my\_receiver.function()}\\
+
+\section{Additional information}
+
+{\bf Receiver frame}: The receiver body frame is a Cartesian coordinates system of the structure containing the receiver, typically a satellite or an aircraft, where the X-axis points towards the front, the Y-axis points towards the right-side (XY define the horizontal plane) and the Z-axis towards Nadir. In absence of inertial rotation of the body frame, we will assume that the X-axis points towards the Earth's North and the Z-axis points towards the Earth's center.\\
+
+{\bf Antenna frame}: the antenna frame is a Cartesian coordinates system with its origin at the antenna's physical center, X- and Y-axis defining the physical plane of the antenna and the Z-axis pointing perpendicularly towards the propagation direction by complying the right-hand rule. Typically, this system is also represented with spherical coordinates, using radial distance, polar angle ($\theta$) and azimuth angle ($\phi$) as commonly used in physics (ISO convention). The antenna gain pattern is given using this type of representation. We define the E-plane and the H-plane as XZ-plane and YZ-plane respectively.\\ 
+
+{\bf Relationship between variables}: Whenever a user changes the value of any variable by means of the available functions, the rest of them are updated to keep consistency with the following equations:
+\begin{itemize}
+\item {\bf antenna\_Aeff} = (C\_LIGHT/{\bf frequency})$^2$ * 10.0**({\bf antenna\_Gain\_dB}/10.0)/(4.0 * $\pi$)
+
+\item {\bf noise\_T} = {\bf antenna\_T} + 290.0 * (10.0**({\bf noise\_F\_dB}/10.0) - 1.0)
+
+\item {\bf noise\_pow\_dBW} = 10.0 * log10(K\_BOLTZ * {\bf noise\_T} * {\bf filter\_BB\_BW})
+\end{itemize}
+where C\_LIGHT is the speed of light in vacuum and K\_BOLTZ is the Boltzmann's constant.
+
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf antenna\_pattern\_dB} (double, 2D array of 181 x 360 elements): Antenna pattern (for a single element) as a function of $\theta$ and $\phi$ in the antenna frame in dB. Default value: 0.0 for all elements
+
+\item {\bf antenna\_vector\_BF\_E} (double, array of 3 elements): Antenna frame's X-axis in the receiver body frame (defines the orientation of the antenna in the receiver frame). Default value: [1.0, 0.0, 0.0]
+
+\item {\bf antenna\_vector\_BF\_H} (double, array of 3 elements): Antenna frame's Y-axis in the receiver body frame (defines the orientation of the antenna in the receiver frame). Default value: [0.0, 1.0, 0.0]
+
+\item {\bf antenna\_vector\_BF\_k} (double, array of 3 elements): Antenna frame's Z-axis in the receiver body frame (defines the orientation of the antenna in the receiver frame). Default value: [0.0, 0.0, 1.0]
+
+\item {\bf isotropic} (boolean): True - An isotropic antenna is employed (antenna pattern neglected), False - A non-isotropic antenna is employed. Default value: True
+
+\item {\bf frequency} (double): Frequency of the receiver in Hz. Default value: 1575420000.0 (GPS L1)
+
+\item {\bf antenna\_Gain\_dB} (double): Antenna gain in dB (this value is added to the antenna pattern). Default value: 3.0
+
+\item {\bf antenna\_Aeff} (double): Effective area of the antenna in meters$^2$. Default value: 0.00575
+
+\item {\bf antenna\_T} (double): Antenna temperature in K. Default value: 200.0
+
+\item {\bf noise\_T} (double): Noise temperature in K. Default value: 488.626
+
+\item {\bf noise\_pow\_dBW} (double): Noise power in dBW. Default value: -134.719
+
+\item {\bf noise\_F\_dB} (double): Noise figure in dB. Default value: 3.0
+
+\item {\bf filter\_BB\_BW} (double):  Base-band bandwidth of the receiver in Hz. Default value: 5000000.0
+
+\item {\bf array\_num\_elements} (integer): If $>1$, the antenna is a 2D planar array of such number of elements. Default value: 1 (single antenna)
+
+\item {\bf element\_pos\_AF} (double, 2D array of {\bf array\_num\_elements} x 2 elements): Position of the array elements as 2D coordinates in plane XY of the antenna frame in meters. Default value: void
+
+\item {\bf phase\_delay} (double, array of {\bf array\_num\_elements}): Phase applied to each element to obtain a desired array factor in radians. Default value: void
+
+\item {\bf array\_factor\_dB} (double, 2D array of 90 x 360 elements): Array factor as a function of $\theta$ and $\phi$ in the antenna frame in dB. Default value: void
+
+\item {\bf array\_factor\_ready} (boolean): True - Array factor is computed, False - Array factor is not computed. Default value: False
+\end{itemize}
+
+\section{Functions}
+
+\subsection{dump\_parameters}
+
+Print relevant information about the object's content (public and private variables).\\
+
+Example:\\
+
+\texttt{my\_receiver.dump\_parameters()}\\
+
+
+\subsection{set\_antenna\_orientation\_BF\_EH}
+
+Set the orientation of the antenna in the receiver body frame by editing private variables {\bf antenna\_vector\_BF\_E} and {\bf antenna\_vector\_BF\_H} ({\bf antenna\_vector\_BF\_k} is constructed using the right hand rule).\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_orientation\_BF\_EH(vector\_E\_in, vector\_H\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_E\_in} (double, array of 3 elements): Antenna frame's X-axis in the receiver body frame.
+\item {\bf vector\_H\_in} (double, array of 3 elements): Antenna frame's Y-axis in the receiver body frame.
+\end{itemize}
+
+
+\subsection{set\_antenna\_orientation\_BF\_k}
+
+Set the pointing direction of the antenna in the receiver body frame by editing the private variable {\bf antenna\_vector\_BF\_k}. In this case, {\bf antenna\_vector\_BF\_E} and {\bf antenna\_vector\_BF\_H} are arbitrary constructed using the right hand rule (this method is valid when there is symmetry between both axis).\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_orientation\_BF\_k(vector\_k\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_k\_in} (double, array of 3 elements): Antenna frame's Z-axis in the receiver body frame.
+\end{itemize}
+
+
+\subsection{get\_antenna\_orientation\_BF}
+
+Get the antenna orientation.\\
+
+Example:\\
+
+\texttt{[vector\_E\_out, vector\_H\_out, vector\_k\_out] = my\_receiver.get\_antenna\_orientation\_BF()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf vector\_E\_out} (double, array of 3 elements): Antenna frame's X-axis in the receiver body frame.
+\item {\bf vector\_H\_out} (double, array of 3 elements): Antenna frame's Y-axis in the receiver body frame.
+\item {\bf vector\_k\_out} (double, array of 3 elements): Antenna frame's Z-axis in the receiver body frame.
+\end{itemize}
+
+
+\subsection{set\_antenna\_whole\_pattern}
+
+Set the antenna pattern.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_whole\_pattern(ant\_pattern)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ant\_pattern} (double, 2D array of 181 x 360 elements): Antenna pattern as a function of $\theta$ and $\phi$ in the antenna frame in dB.
+\end{itemize}
+
+
+\subsection{set\_val\_antenna\_pattern}
+
+Set an individual value of the antenna pattern.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_val\_antenna\_pattern(phi\_index, theta\_index, pattern\_dB\_value)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf phi\_index} (integer): Sample at coordinate $\phi$ of the antenna pattern (coincides with the integer value of angle $\phi$ in the antenna frame).
+\item {\bf theta\_index} (integer): Sample at coordinate $\theta$ of the antenna pattern (coincides with the integer value of angle $\theta$ in the antenna frame).
+\item {\bf pattern\_dB\_value} (double): Value of the antenna pattern in dB.
+\end{itemize}
+
+
+\subsection{set\_antenna\_pattern\_FF}
+
+Set antenna pattern from a single full (for all $\theta$ angles) full (for $\phi$=0 and $\phi$=180) cut at the E-plane. It is assumed that both E- and H-planes are equal and interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_pattern\_FF(ant\_pattern\_E\_cut)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ant\_pattern\_E\_cut} (double, array of 360 elements): Antenna pattern in the E-plane as a function of $\theta$ angle in dB.
+\end{itemize}
+
+
+\subsection{set\_antenna\_pattern\_FH}
+
+Set antenna pattern from a single full (for all $\theta$ angles) half (only for $\phi$=0) cut at the E-plane. It is assumed that both E- and H-planes are equal and interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_pattern\_FH(ant\_pattern\_E\_halfcut)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ant\_pattern\_E\_halfcut} (double, array of 181 elements): Antenna pattern in the E-plane as a function of $\theta$ angle in dB.
+\end{itemize}
+
+
+\subsection{set\_antenna\_pattern\_interp}
+
+Set the antenna pattern by providing a set of points in the E-plane and a minimum level. The whole shape of the E-plane pattern is then built by means of a piece-wise spline interpolation strategy (spline interpolation for each segment between two minimum-level values). If $\theta$ values range from 0 to 180 degrees, symmetry is applied. Finally, it is assumed that both E- and H-planes are equal and interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_pattern\_interp(theta\_points, pattern\_points, min\_level)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf theta\_points} (double, array of N elements): Theta angle values in the E-plane in degrees.
+\item {\bf pattern\_points} (double, array of N elements): Antenna pattern values at {\bf theta\_points} in dB.
+\item {\bf min\_level} (double): Minimum level to split the spline interpolation between contiguous segments.
+\end{itemize}
+
+
+\subsection{set\_antenna\_patterns\_FF}
+
+Set antenna pattern from single full (for all $\theta$ angles) full (for $\phi$=0/90 and $\phi$=180/270) cuts at both E- and H-plane. Interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_patterns\_FF(ant\_pattern\_E\_cut, ant\_pattern\_H\_cut)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ant\_pattern\_E\_cut} (double, array of 360 elements): Antenna pattern in the E-plane as a function of $\theta$ angle in dB.
+\item {\bf ant\_pattern\_H\_cut} (double, array of 360 elements): Antenna pattern in the H-plane as a function of $\theta$ angle in dB.
+\end{itemize}
+
+
+\subsection{set\_antenna\_patterns\_FH}
+
+Set antenna pattern from single full (for all $\theta$ angles) half (only for $\phi$=0/90) cuts at both E- and H-plane. Interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_patterns\_FH(ant\_pattern\_E\_halfcut, ant\_pattern\_H\_halfcut)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ant\_pattern\_E\_halfcut} (double, array of 181 elements): Antenna pattern in the E-plane as a function of $\theta$ angle in dB.
+\item {\bf ant\_pattern\_H\_halfcut} (double, array of 181 elements): Antenna pattern in the H-plane as a function of $\theta$ angle in dB.
+\end{itemize}
+
+
+\subsection{set\_antenna\_patterns\_interp}
+
+Set the antenna pattern by providing a set of points in both E- and H-planes and a minimum level. The whole shape of both E- and H-plane patterns is then built by means of a piece-wise spline interpolation strategy (spline interpolation for each segment between two minimum-level values). If $\theta$ values range from 0 to 180 degrees, symmetry is applied. Finally, interpolation is applied for the remaining points.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_patterns\_interp(theta\_E\_points, pattern\_E\_points, theta\_H\_points, pattern\_H\_points, min\_level)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf theta\_E\_points} (double, array of N elements): Theta angle values in the E-plane in degrees.
+\item {\bf pattern\_E\_points} (double, array of N elements): Antenna pattern values at theta\_E\_points in dB.
+\item {\bf theta\_H\_points} (double, array of M elements): Theta angle values in the H-plane in degrees.
+\item {\bf pattern\_H\_points} (double, array of M elements): Antenna pattern values at theta\_H\_points in dB.
+\item {\bf min\_level} (double): Minimum level to split the spline interpolation between contiguous segments.
+\end{itemize}
+
+
+\subsection{get\_antenna\_whole\_pattern}
+
+Get the antenna pattern.\\
+
+Example:\\
+
+\texttt{ant\_pattern = my\_receiver.get\_antenna\_whole\_pattern}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf ant\_pattern} (double, 2D array of 181 x 360 elements): Antenna pattern as a function of $\theta$ and $\phi$ in the antenna frame in dB.
+\end{itemize}
+
+
+\subsection{get\_antenna\_patterns}
+
+Get the E- and H-plane cuts of the antenna pattern.\\
+
+Example:\\
+
+\texttt{[ant\_pattern\_E, ant\_pattern\_H] = my\_receiver.get\_antenna\_patterns()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf ant\_pattern\_E} (double, array of 360 elements): E-plane cut of the antenna pattern in dB.
+\item {\bf ant\_pattern\_H} (double, array of 360 elements): H-plane cut of the antenna pattern in dB.
+\end{itemize}
+
+
+\subsection{set\_receiver\_params}
+
+Set the main parameters of the receiver (by editing the corresponding private variables).\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_receiver\_params(antenna\_Gain\_dB\_in, antenna\_T\_in, noise\_F\_dB\_in, filter\_BW\_in, isotropic\_antenna)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf antenna\_Gain\_dB\_in} (double): Antenna gain in dB.
+\item {\bf antenna\_T\_in} (double): Antenna temperature in K.
+\item {\bf noise\_F\_dB\_in} (double): Noise figure in dB.
+\item {\bf filter\_BW\_in} (double): Base-band bandwidth of the receiver in Hz.
+\item {\bf isotropic\_antenna} (char): 1 - Isotropic antenna, 0 - Non-isotropic antenna.
+\end{itemize}
+
+
+\subsection{set\_antenna\_eff\_area}
+
+Set the antenna effective area.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_eff\_area(antenna\_Aeff\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf antenna\_Aeff\_in} (double): Effective area of the antenna in meters$^2$.
+\end{itemize}
+
+
+\subsection{set\_noise\_T}
+
+Set the noise temperature.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_noise\_T(noise\_T\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf noise\_T\_in} (double): Noise temperature in K.
+\end{itemize}
+
+
+\subsection{set\_noise\_pow\_dBW}
+
+Set the noise power.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_noise\_pow\_dBW(noise\_pow\_dBW\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf noise\_pow\_dBW\_in} (double): Noise power in dBW.
+\end{itemize}
+
+
+\subsection{set\_frequency}
+
+Set the frequency of the receiver.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_frequency(frequency\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf frequency\_in} (double): Frequency in Hz.
+\end{itemize}
+
+
+\subsection{get\_PhiTheta\_gain\_dB}
+
+Get the antenna gain as a function of $\phi$ and $\theta$ angles in the antenna frame.\\
+
+Example:\\
+
+\texttt{my\_receiver.get\_PhiTheta\_gain\_dB(phi, theta)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf phi} (double): Angle $\phi$ in the antenna frame in degrees.
+\item {\bf theta} (double): Angle $\theta$ in the antenna frame in degrees.
+\end{itemize}
+
+
+\subsection{get\_incvector\_gain\_dB}
+
+Get the antenna gain as a function of the incidence or transmitting vector in the receiver body frame.\\
+
+Example:\\
+
+\texttt{my\_receiver.get\_incvector\_gain\_dB(incvector)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incvector} (double, array of 3 elements): Incidence or transmitting vector in the receiver body frame.
+\end{itemize}
+
+
+\subsection{get\_frequency}
+
+Get the frequency of the receiver.\\
+
+Example:\\
+
+\texttt{freq = my\_receiver.get\_frequency()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf freq} (double): Frequency of the receiver in Hz.
+\end{itemize}
+
+
+\subsection{get\_antenna\_Gain\_dB}
+
+Get the antenna gain (for isotropic antennas).\\
+
+Example:\\
+
+\texttt{gain = my\_receiver.get\_antenna\_Gain\_dB()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf gain} (double): Antenna gain in dB.
+\end{itemize}
+
+
+\subsection{get\_antenna\_Aeff}
+
+Get the effective area of the antenna.\\
+
+Example:\\
+
+\texttt{eff\_area = my\_receiver.get\_antenna\_Aeff()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf eff\_area} (double): Effective area of the antenna in meters$^2$.
+\end{itemize}
+
+
+\subsection{get\_antenna\_T}
+
+Get the antenna temperature.\\
+
+Example:\\
+
+\texttt{ant\_temp = my\_receiver.get\_antenna\_T()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf ant\_temp} (double): Antenna temperature in K.
+\end{itemize}
+
+
+\subsection{get\_noise\_T}
+
+Get the noise temperature.\\
+
+Example:\\
+
+\texttt{noise\_temp = my\_receiver.get\_noise\_T()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf noise\_temp} (double): Noise temperature in K.
+\end{itemize}
+
+
+\subsection{get\_noise\_pow\_dBW}
+
+Get the noise power.\\
+
+Example:\\
+
+\texttt{noise\_pow = my\_receiver.get\_noise\_pow\_dBW()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf noise\_pow} (double): Noise power in dBW.
+\end{itemize}
+
+
+\subsection{get\_noise\_F\_dB}
+
+Get the noise figure.\\
+
+Example:\\
+
+\texttt{noise\_F = my\_receiver.get\_noise\_F\_dB()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf noise\_F} (double): Noise figure in dB.
+\end{itemize}
+
+
+\subsection{get\_filter\_BB\_BW}
+
+Get the base-band bandwidth of the receiver.\\
+
+Example:\\
+
+\texttt{BW = my\_receiver.get\_filter\_BB\_BW()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf BW} (double): Base-band bandwidth of the receiver in Hz.
+\end{itemize}
+
+
+\subsection{set\_antenna\_elements\_pos\_AF}
+
+Set a distribution of antenna elements over the antenna frame to have a 2D planar array.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_antenna\_elements\_pos\_AF(element\_pos\_in, lambda\_units)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf element\_pos\_in} (double, 2D array of N x 2 elements): Positions of the array elements as 2D coordinates in plane XY of the antenna frame in meters or in units of lambda in {\bf lambda\_units} = 1.
+\item {\bf lambda\_units} (char): 1 - {\bf element\_pos\_in} is given in lambda units, 0/else - {\bf element\_pos\_in} is given in meters.
+\end{itemize}
+
+
+\subsection{set\_phase\_delays}
+
+Set the phases applied to each element to obtain a desired array factor.\\
+
+Example:\\
+
+\texttt{my\_receiver.set\_phase\_delays(phase\_delay\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf phase\_delay\_in} (double, array of num\_elements elements): Phases applied to each element to obtain a desired array factor in radians.
+\end{itemize}
+
+
+\subsection{get\_phase\_delays}
+
+Get the phases applied to each element to obtain a desired array factor.\\
+
+Example:\\
+
+\texttt{phase\_delay\_out = my\_receiver.get\_phase\_delays(num\_elements\_out)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf num\_elements\_out} (integer): Number of elements of the array (it has to be equal to {\bf num\_elements}).
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf phase\_delay\_out} (double, array of {\bf num\_elements\_out} elements): Phases applied to each element to obtain a desired array factor in radians.
+\end{itemize}
+
+
+\subsection{compute\_array\_factor}
+
+Compute and store the array factor based on the phases and the distribution of the antenna elements.\\
+
+Example:\\
+
+\texttt{my\_receiver.compute\_array\_factor()}\\
+
+
+
+\subsection{get\_array\_factor}
+
+Get the array factor stored.\\
+
+Example:\\
+
+\texttt{array\_factor\_out = my\_receiver.get\_array\_factor()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf array\_factor\_out} (double, 2D array of 90 x 360 elements): Array factor as a function of $\theta$ and $\phi$ in the antenna frame in dB.
+\end{itemize}
+
+
+\subsection{compute\_phase\_delays\_UPA}
+
+Compute the phases to be applied to each element to get an array factor with a desired pointing direction, based on uniformly-distributed planar array (UPA) theory.\\
+
+Example:\\
+
+\texttt{my\_receiver.compute\_phase\_delays\_UPA(theta\_max, phi\_max)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf theta\_max} (double): Angle $\theta$ with maximum array factor gain in the antenna frame in degrees.
+\item {\bf phi\_max} (double): Angle $\phi$ with maximum array factor gain in the antenna frame in degrees.
+\end{itemize}
+
+
+\subsection{compute\_phase\_delays\_pos\_ECEF\_RT}
+
+Compute the phases to be applied to each element to get an array factor with a desired pointing direction, based on the ECEF position of a receiver (where the array is placed), a transmitter (where the array is pointing at) and the inertial information of the receiver.\\
+
+Example:\\
+
+\texttt{my\_receiver.compute\_phase\_delays\_pos\_ECEF\_RT([roll\_in, pitch\_in, yaw\_in], posR\_km, posT\_km)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf roll\_in} (double): Inertial rotation of the X-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf pitch\_in} (double): Inertial rotation of the Y-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf heading\_in} (double): Inertial rotation of the Z-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf posR\_km} (double, array of 3 elements): Position of the receiver in ECEF coordinates in km.
+\item {\bf posT\_km} (double, array of 3 elements): Position of the transmitter in ECEF coordinates in km.
+\end{itemize}

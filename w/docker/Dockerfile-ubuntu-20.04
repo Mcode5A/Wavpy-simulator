@@ -1,0 +1,10 @@
+FROM ubuntu:20.04
+
+WORKDIR /usr/waveform_pylib
+COPY . .
+
+RUN ./install-packages-ubuntu-20.04.sh
+
+
+
+

@@ -1,0 +1,37 @@
+stages:
+  - docker-build
+  - build
+  - test
+
+build-image:
+  stage: docker-build
+  image: 
+    name: docker
+  script:
+    - pwd 
+    - cd docker
+    - docker build -t ice/wavpy:ubuntu-20.04 -f Dockerfile-ubuntu-20.04 .
+
+
+build-wavpy:
+  stage: build
+  image: ice/wavpy:ubuntu-20.04
+  script:
+    - cd build
+    - cmake ..
+    - make
+    - make doc_doxygen
+  artifacts:
+    paths:
+      - build/
+
+test-wavpy:
+  stage: test
+  image: ice/wavpy:ubuntu-20.04
+  script:
+    - cd build/test/
+    - ctest
+  artifacts:
+    paths:
+      - build/test/Testing/Temporary
+  

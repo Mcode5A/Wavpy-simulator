@@ -1,0 +1,663 @@
+\chapter{Waveform\_complex\_cluster}\label{cha:wavcom}
+
+This class provides means to analyze and characterize time series of complex GNSS+R waveforms.\\
+
+Example of object construction with arbitrary name {\it my\_wavcluster}:\\
+
+\texttt{my\_wavcluster = wavpy.Waveform\_complex\_cluster()}\\
+
+In this case, public variables and functions from object {\it my\_wavcluster} of class {\it Waveform\_complex\_cluster} can be respectively checked/modified or called with:\\
+
+\texttt{my\_wavcluster.variable}\\
+
+\texttt{my\_wavcluster.function()}\\
+
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf num\_valid\_wavs} (integer): Number of valid waveforms stored in the cluster. Default value: 0
+
+\item {\bf num\_phasor\_iter} (integer): Number of operations made with the stored phasor. Default value: 0
+\end{itemize}
+
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf Icomponents} (double, 2D array of {\bf cluster\_length} x {\bf wav\_length} elements): In-phase components of waveforms stored in the cluster. Default value: void
+
+\item {\bf Qcomponents} (double, 2D array of {\bf cluster\_length} x {\bf wav\_length} elements): Quadrature components of waveforms stored in the cluster. Default value: void
+
+\item {\bf valid\_wavs} (boolean, array of {\bf cluster\_length} elements): Boolean array indicating the validity of the stored complex waveforms in the cluster. Default value: void
+
+\item {\bf phasorI} (double, array of {\bf cluster\_length} elements): In-phase component of a complex phasor stored in the cluster. Default value: void
+
+\item {\bf phasorQ} (double, array of {\bf cluster\_length} elements): Quadrature component of a complex phasor stored in the cluster. Default value: void
+
+\item {\bf valid\_phasor} (boolean, array of {\bf cluster\_length} elements): Boolean array indicating the validity of the stored complex phasor in the cluster. Default value: void
+
+\item {\bf wav\_length} (integer): Size of the waveforms stored in the cluster. Default value: 0
+
+\item {\bf cluster\_length} (integer): Length of the cluster. Default value: 0
+\end{itemize}
+
+
+\section{Functions}
+
+\subsection{initialize}
+
+Initialize the size of the cluster to allocate the required memory.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.initialize(in\_cluster\_length, wav\_in\_length)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf in\_cluster\_length} (integer): Length of the cluster.
+\item {\bf wav\_in\_length} (integer): Length of the waveforms to be stored in the cluster.
+\end{itemize}
+
+
+\subsection{add\_waveform}
+
+Add a complex waveform to the cluster at a given position.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.add\_waveform(Icomp\_in, Qcomp\_in, cluster\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf Icomp\_in} (double, array of {\bf wav\_length} elements): In-phase components of complex waveform in arbitrary units.
+\item {\bf Qcomp\_in} (double, array of {\bf wav\_length} elements): Quadrature components of complex waveform in arbitrary units.
+\item {\bf cluster\_pos} (integer): Position to store the complex waveform inside the cluster (from 0 to {\bf cluster\_length} - 1).
+\end{itemize}
+
+
+\subsection{add\_waveform\_scale}
+
+Add a complex waveform to the cluster at a given position and multiplied by a given scaling factor.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.add\_waveform\_scale(Icomp\_in, Qcomp\_in, cluster\_pos, scale\_factor)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf Icomp\_in} (double, array of {\bf wav\_length} elements): In-phase components of complex waveform in arbitrary units.
+\item {\bf Qcomp\_in} (double, array of {\bf wav\_length} elements): Quadrature components of complex waveform in arbitrary units.
+\item {\bf cluster\_pos} (integer): Position to store the complex waveform inside the cluster (from 0 to {\bf cluster\_length} - 1).
+\item {\bf scale\_factor} (double): Scaling factor applied to the input complex waveform before being stored in the cluster.
+\end{itemize}
+
+
+\subsection{add\_waveform\_GOLD}
+
+Add a complex waveform with the format of IEEC's GOLD-RTR dataset to the cluster at a given position.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.add\_waveform\_GOLD(Icomponents\_in, Qcomponents\_in, cluster\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf Icomponents\_in} (signed char, array of {\bf wav\_length} elements): In-phase components of complex waveform in arbitrary units.
+\item {\bf Qcomponents\_in} (signed char, array of {\bf wav\_length} elements): Quadrature components of complex waveform in arbitrary units.
+\item {\bf cluster\_pos} (integer): Position to store the complex waveform inside the cluster (from 0 to {\bf cluster\_length} - 1).
+\end{itemize}
+
+
+\subsection{add\_waveform\_PIR}
+
+Add a complex waveform with the format of IEEC's PIR dataset to the cluster at a given position.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.add\_waveform\_PIR(XiYi, XqYq, XiYq, XqYi, cluster\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf XiYi} (short integer, array of {\bf wav\_length} elements): Correlation between in-phase components of direct and reflected signals in arbitrary units.
+\item {\bf XqYq} (short integer, array of {\bf wav\_length} elements): Correlation between quadrature components of direct and reflected signals in arbitrary units.
+\item {\bf XiYq} (short integer, array of {\bf wav\_length} elements): Correlation between in-phase component of direct signal and quadrature component of reflected signal in arbitrary units.
+\item {\bf XqYi} (short integer, array of {\bf wav\_length} elements): Correlation between quadrature component of direct signal and in-phase component of reflected signal in arbitrary units.
+\item {\bf cluster\_pos} (integer): Position to store the complex waveform inside the cluster (from 0 to {\bf cluster\_length} - 1).
+\end{itemize}
+
+
+\subsection{load\_ITF\_waveforms\_SPIR}
+
+Load a cluster of 999 complex interferometric waveforms from a 1-second IEEC's SPIR binary file.\\
+
+Example:\\
+
+\texttt{start\_window\_delay = my\_wavcluster.load\_ITF\_waveforms\_SPIR(namefile, peak\_delay\_estimate, BF\_phases\_UP, BF\_phases\_DW, filter\_num)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf namefile} (string): Filename of SPIR 1-second binary file.
+\item {\bf peak\_delay\_estimate} (double): Raw estimation of the range delay of the waveform's peak in meters.
+\item {\bf BF\_phases\_UP} (double, array of 8 elements): Beamformer phases (in degrees) to be applied at each of the 8 up-looking antenna elements of the SPIR setup to get maximum antenna gain towards a desired direction.
+\item {\bf BF\_phases\_DW} (double, array of 8 elements): Beamformer phases (in degrees) to be applied at each of the 8 down-looking antenna elements of the SPIR setup to get maximum antenna gain towards a desired direction.
+\item {\bf filter\_num} (integer): Code to select the frequency-domain filter to be applied during the processing. 1 - Galileo at E1, 2 - GPS/Galileo at L5, other - GPS at L1 removing the C/A code band. 
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf start\_window\_delay} (double): Range delay of the first waveform sample in meters.
+\end{itemize}
+
+
+\subsection{load\_ITF\_waveforms\_SPIR\_selected\_signals}
+
+Load a cluster of 999 complex interferometric waveforms from a 1-second IEEC's SPIR binary file by selecting a set of input signals (16 available).\\
+
+Example:\\
+
+\texttt{start\_window\_delay = my\_wavcluster.load\_ITF\_waveforms\_SPIR\_selected\_signals(namefile, peak\_delay\_estimate, BF\_phases, signal\_elements\_1, signal\_elements\_2, filter\_num)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf namefile} (string): Filename of SPIR 1-second binary file.
+\item {\bf peak\_delay\_estimate} (double): Raw estimation of the range delay of the waveform's peak in meters.
+\item {\bf BF\_phases} (double, array of 16 elements): Beamformer phases (in degrees) to be applied at each of the 16 antenna elements of the SPIR setup to get maximum antenna gain towards a desired direction. Note that only those elements indicated on input variables {\bf signal\_elements\_1} and {\bf signal\_elements\_2} will be employed.
+\item {\bf signal\_elements\_1} (signed char, array of 16 elements): Array indicator of which antenna elements (those indexes with a value equal to '1') will be combined to generate signal 1 (to be cross-correlated against signal 2).
+\item {\bf signal\_elements\_2} (signed char, array of 16 elements): Array indicator of which antenna elements (those indexes with a value equal to '1') will be combined to generate signal 2 (to be cross-correlated against signal 1).
+\item {\bf filter\_num} (integer): Code to select the frequency-domain filter to be applied during the processing. 1 - Galileo at E1, 2 - GPS/Galileo at L5, other - GPS at L1 removing the C/A code band. 
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf start\_window\_delay} (double): Range delay of the first waveform sample in meters.
+\end{itemize}
+
+
+\subsection{load\_CR\_waveforms\_SPIR}
+
+Load a cluster of 999 complex GPS L1-CA clean-replica waveforms from a 1-second IEEC's SPIR binary file.\\
+
+Example:\\
+
+\texttt{start\_window\_delay = my\_wavcluster.load\_CR\_waveforms\_SPIR(namefile, peak\_delay\_estimate, doppler\_estimate, delta\_doppler, BF\_phases, uplooking\_channel, code\_ref)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf namefile} (string): Filename of SPIR 1-second binary file.
+\item {\bf peak\_delay\_estimate} (double): Raw estimation of the range delay of the waveform's peak in meters.
+\item {\bf doppler\_estimate} (double): Estimation of the Doppler frequency of the direct signal in Hz (also required when computing waveforms from reflected signals).
+\item {\bf delta\_doppler} (double): Estimation of the Doppler frequency difference of the reflected signal with respect to the direct one in Hz (set to zero in case of computing waveforms from direct signals).
+\item {\bf BF\_phases} (double, array of 16 elements): Beamformer phases (in degrees) to be applied at each of the 16 antenna elements of the SPIR setup to get maximum antenna gain towards a desired direction.
+\item {\bf uplooking\_channel} (boolean): True - Cross-correlation against direct signals using up-looking antenna elements. False - Cross-correlation against direct or reflected signals using down-looking antenna elements.
+\item {\bf code\_ref} (integer): GPS PRN number. 
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf start\_window\_delay} (double): Range delay of the first waveform sample in meters.
+\end{itemize}
+
+
+\subsection{load\_CR\_waveforms\_SPIR\_selected\_signals}
+
+Load a cluster of 999 complex GPS L1-CA clean-replica waveforms from a 1-second IEEC's SPIR binary file by selecting a set of input signals (16 available).\\
+
+Example:\\
+
+\texttt{start\_window\_delay = my\_wavcluster.load\_CR\_waveforms\_SPIR\_selected\_signals(namefile, peak\_delay\_estimate, doppler\_estimate, assist\_doppler, BF\_phases, signal\_elements, code\_ref)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf namefile} (string): Filename of SPIR 1-second binary file.
+\item {\bf peak\_delay\_estimate} (double): Raw estimation of the range delay of the waveform's peak in meters.
+\item {\bf doppler\_estimate} (double): Estimation of the Doppler frequency of the direct signal in Hz (also required when computing waveforms from reflected signals).
+\item {\bf assist\_doppler} (boolean): True - Enable search of Doppler frequency (having {\bf doppler\_estimate} as initial reference). False - Disable search of Doppler frequency (rely on {\bf doppler\_estimate}).
+\item {\bf BF\_phases} (double, array of 16 elements): Beamformer phases (in degrees) to be applied at each of the 16 antenna elements of the SPIR setup to get maximum antenna gain towards a desired direction. Note that only those elements indicated on input variable {\bf signal\_elements} will be employed.
+\item {\bf signal\_elements} (signed char, array of 16 elements): Array indicator of which antenna elements (those indexes with a value equal to '1') will be combined to generate the signal.
+\item {\bf code\_ref} (integer): GPS PRN number. 
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf start\_window\_delay} (double): Range delay of the first waveform sample in meters.
+\end{itemize}
+
+
+\subsection{searching\_CR\_waveforms\_SPIR}
+
+Search of GPS L1-CA clean-replica signals from a 1-second IEEC's SPIR binary file by selecting a set of input signals (16 available). Basically, it scans the Doppler domain cross-correlating against a clean-replica model of each PRN in order to get the maximum response. Then, it prints on the screen the corresponding Doppler frequency and peak-to-noise ratio values obtained.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.searching\_CR\_waveforms\_SPIR(namefile, signal\_elements)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf namefile} (string): Filename of SPIR 1-second binary file.
+\item {\bf signal\_elements} (signed char, array of 16 elements): Array indicator of which antenna elements (those indexes with a value equal to '1') will be evaluated.
+\end{itemize}
+
+
+\subsection{get\_waveform}
+
+Get one of the stored complex waveforms.\\
+
+Example:\\
+
+\texttt{[wavI\_out, wavQ\_out] = my\_wavcluster.get\_waveform(len\_I, len\_Q, cluster\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf len\_I} (integer): Number of samples of the in-phase component of the stored waveform (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf len\_I}.
+\item {\bf len\_Q} (integer): Number of samples of the quadrature component of the stored waveform (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf len\_Q}.
+\item {\bf cluster\_pos} (integer): Position of the complex waveform to be got.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wavI\_out} (double, array of {\bf wav\_len} elements): In-phase component of the complex waveform in arbitrary units.
+\item {\bf wavQ\_out} (double, array of {\bf wav\_len} elements): Quadrature component of the complex waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{integrate\_waveforms}
+
+Integrate the cluster of complex waveforms, both coherent and incoherent, to get a power waveform.\\
+
+Example:\\
+
+\texttt{wav\_out = my\_wavcluster.integrate\_waveforms(coherent\_int, wav\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf wav\_len} (integer): Number of samples of the stored waveforms (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf wav\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_out} (double, array of {\bf wav\_len} elements): Integrated power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{integrate\_waveforms\_remdir}
+
+Integrate the cluster of complex waveforms, both coherent and incoherent, to get a power waveform after removing a longer coherent component to mitigate direct signal interference.\\
+
+Example:\\
+
+\texttt{wav\_out = my\_wavcluster.integrate\_waveforms\_remdir(coherent\_int, coherent\_int\_dir, wav\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf coherent\_int\_dir} (integer): Number of samples of coherent integration for mitigation of direct signal interference (from 1 to {\bf cluster\_length}).
+\item {\bf wav\_len} (integer): Number of samples of the stored waveforms (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf wav\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_out} (double, array of {\bf wav\_len} elements): Integrated power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{integrate\_waveforms\_retracking}
+
+Integrate the cluster of complex waveforms, both coherent and incoherent, to get a power waveform after applying a given complex retracking along the cluster. In this context, "to apply a {\it retracking}" means to rotate and move in delay each complex waveform given a range value with the purpose of better align them before integration.\\
+
+Example:\\
+
+\texttt{wav\_out = my\_wavcluster.integrate\_waveforms\_retracking(coherent\_int, sampling\_rate, retracking\_meters, wav\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf sampling\_rate} (double): Sampling rate of the waveforms from the cluster in samples/sec.
+\item {\bf retracking\_meters} (double, array of {\bf cluster\_length} elements): Retracking (in meters) to be applied to each waveform of the cluster before the integration.
+\item {\bf wav\_len} (integer): Number of samples of the stored waveforms (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf wav\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_out} (double, array of {\bf wav\_len} elements): Integrated power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{dump\_phase}
+
+Print a time series of the phase from the stored waveform's cluster at a given lag position (only where there are valid values).\\
+
+Example:\\
+
+\texttt{my\_wavcluster.dump\_phase(lag\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lag\_pos} (integer): Lag position at the waveform's cluster selected to print out a time series of its phase.
+\end{itemize}
+
+
+\subsection{dump\_phase\_peak}
+
+Print a time series of the phase from the stored waveform's cluster at a the peak position (only where there are valid values).\\
+
+Example:\\
+
+\texttt{my\_wavcluster.dump\_phase\_peak()}\\
+
+
+\subsection{store\_phasor\_wavs}
+
+Store the contents of the waveform's cluster at a given lag in a parallel phasor for analysis purposes.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.store\_phasor\_wavs(lag\_pos)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lag\_pos} (integer): Lag position at the waveform's cluster selected to store its contents in a parallel phasor.
+\end{itemize}
+
+
+\subsection{get\_phasor}
+
+Get the stored phasor.\\
+
+Example:\\
+
+\texttt{[phasorI\_out, phasorQ\_out, valid\_phasor\_out] = my\_wavcluster.get\_phasor(len\_Iphasor, len\_Qphasor, len\_Vphasor)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf len\_Iphasor} (integer): Number of samples of the in-phase component of the stored phasor (it has to be equal to {\bf cluster\_length}). Recommendation: use \texttt{my\_wavcluster.get\_cluster\_length()} as {\bf len\_Iphasor}.
+\item {\bf len\_Qphasor} (integer): Number of samples of the quadrature component of the stored phasor (it has to be equal to {\bf cluster\_length}). Recommendation: use \texttt{my\_wavcluster.get\_cluster\_length()} as {\bf len\_Qphasor}.
+\item {\bf len\_Vphasor} (integer): Number of samples of the array that indicates the validity of the stored phasor (it has to be equal to {\bf cluster\_length}). Recommendation: use \texttt{my\_wavcluster.get\_cluster\_length()} as {\bf len\_Vphasor}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf phasorI\_out} (double, array of {\bf len\_Iphasor} elements): In-phase component of the stored phasor.
+\item {\bf phasorQ\_out} (double, array of {\bf len\_Qphasor} elements): Quadrature component of the stored phasor.
+\item {\bf valid\_phasor\_out} (signed char, array of {\bf len\_Vphasor} elements): Array that indicates the validity of the stored phasor (1 - valid, 0 - non-valid).
+\end{itemize}
+
+
+\subsection{get\_sigma\_phase\_phasor}
+
+Compute the standard deviation of the phase from the stored phasor with the requirement of a given minimum number of valid samples (returns -1 if not enough valid samples).\\
+
+Example:\\
+
+\texttt{my\_wavcluster.get\_sigma\_phase\_phasor(min\_valid\_samples)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf min\_valid\_samples} (integer): Minimum number of valid samples in stored phasor to compute the standard deviation of the phase.
+\end{itemize}
+
+
+\subsection{get\_sigma\_phase\_phasor\_interv}
+
+Compute the standard deviation of the phase from the stored phasor within a given interval and with the requirement of a given minimum number of valid samples (returns -1 if not enough valid samples).\\
+
+Example:\\
+
+\texttt{my\_wavcluster.get\_sigma\_phase\_phasor\_interv(init\_sample, interv\_samples, min\_valid\_samples)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf init\_sample} (integer): Initial sample of the selected interval in the stored phasor to compute the standard deviation of the phase.
+\item {\bf interv\_samples} (integer): Number of samples of the selected interval in the stored phasor to compute the standard deviation of the phase.
+\item {\bf min\_valid\_samples} (integer): Minimum number of valid samples within the selected interval of the stored phasor to compute the standard deviation of the phase.
+\end{itemize}
+
+
+\subsection{counterrot\_phasor}
+
+Counter-rotate the stored phasor with a given array of phases.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.counterrot\_phasor(phases\_rad, valid\_phases)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf phases\_rad} (double, array of {\bf cluster\_length} elements): Time series of input phases (in radians) employed to counter-rotate the stored phasor.
+\item {\bf valid\_phases} (signed char, array of {\bf cluster\_length} elements): Array that indicates the validity of {\bf phases\_rad} (1 - valid, 0 - non-valid).
+\end{itemize}
+
+
+\subsection{counterrot\_waveforms}
+
+Counter-rotate the stored complex waveforms with a given array of phases.\\
+
+Example:\\
+
+\texttt{my\_wavcluster.counterrot\_phasor(phases\_rad, valid\_phases)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf phases\_rad} (double, array of {\bf cluster\_length} elements): Time series of input phases (in radians) employed to counter-rotate the stored complex waveforms.
+\item {\bf valid\_phases} (signed char, array of {\bf cluster\_length} elements): Array that indicates the validity of {\bf phases\_rad} (1 - valid, 0 - non-valid).
+\end{itemize}
+
+
+\subsection{correct\_navigation\_bit}
+
+Apply an algorithm to correct the navigation bit (for GPS L1 C/A code) in all the waveforms from the stored cluster. Such algorithm analyzes the phase variations at a given lag and decides where there is a bit transition. Since coherence and proper SNR are required, this function is recommended for waveform clusters containing direct GPS L1 signals; however, the information obtained could be later applied to the clusters containing their corresponding reflections (if available).\\
+
+Example:\\
+
+\texttt{my\_wavcluster.correct\_navigation\_bit(lag\_pos, store\_navbit\_phasorI)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lag\_pos} (integer): Lag position where the algorithm is applied (peak is recommended).
+\item {\bf store\_navbit\_phasorI} (integer): 1 - store the time series of the navigation bit estimated at the in-phase component of the stored phasor, 0 - do not store the navigation bit.
+\end{itemize}
+
+
+\subsection{compute\_coherence\_time}
+
+Apply an algorithm to estimate the coherence time from the stored cluster. Such algorithm checks the accumulated phase variation at a given lag and sets the coherence time at the moment when such variation reaches 1~radian.\\
+
+Example:\\
+
+\texttt{coh\_time = my\_wavcluster.compute\_coherence\_time(lag\_pos, store\_acdiff\_phasorQ)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lag\_pos} (integer): Lag position where the algorithm is applied (peak is recommended).
+\item {\bf store\_acdiff\_phasorQ} (integer): 1 - store the time series of the accumulated phase difference at the quadrature component of the stored phasor, 0 - do not store the navigation bit.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf coh\_time} (double): Coherence time obtained in cluster sample units.
+\end{itemize}
+
+
+\subsection{compute\_singlefreq\_DDM}
+
+Compute a DDM's Doppler slice from the waveform cluster. The procedure is the same as doing an integration, but after modulating the waveforms using a phasor at the given frequency.\\
+
+Example:\\
+
+\texttt{freq\_ddm\_out = my\_wavcluster.compute\_singlefreq\_DDM(coherent\_int, doppler\_freq, ddm\_lag\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf doppler\_freq} (double): Doppler frequency of the output DDM slice in inverse cluster sample units.
+\item {\bf ddm\_lag\_len} (integer): Number of delay samples of the DDM (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf ddm\_lag\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf freq\_ddm\_out} (double, array of {\bf ddm\_lag\_len} elements): DDM's Doppler slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_singlefreq\_DDM\_remdir}
+
+Compute a DDM's Doppler slice from the waveform cluster after removing a longer coherent component to mitigate direct signal interference. The procedure is the same as doing an integration, but after modulating the waveforms using a phasor at the given frequency.\\
+
+Example:\\
+
+\texttt{freq\_ddm\_out = my\_wavcluster.compute\_singlefreq\_DDM\_remdir(coherent\_int, coherent\_int\_dir, doppler\_freq, ddm\_lag\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf coherent\_int\_dir} (integer): Number of samples of coherent integration for mitigation of direct signal interference (from 1 to {\bf cluster\_length}).
+\item {\bf doppler\_freq} (double): Doppler frequency of the output DDM slice in inverse cluster sample units.
+\item {\bf ddm\_lag\_len} (integer): Number of delay samples of the DDM (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wavcluster.get\_wav\_length()} as {\bf ddm\_lag\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf freq\_ddm\_out} (double, array of {\bf ddm\_lag\_len} elements): DDM's Doppler slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_singlelag\_DDM}
+
+Compute a DDM's delay slice from the waveform cluster. The procedure is the same as doing an integration, but after modulating the waveforms using a phasor at a given set of frequencies.\\
+
+Example:\\
+
+\texttt{lag\_ddm\_out = my\_wavcluster.compute\_singlelag\_DDM(coherent\_int, lag\_pos, delta\_freq, ddm\_freq\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf lag\_pos} (integer): Delay lag of the output DDM slice.
+\item {\bf delta\_freq} (double): Doppler frequency resolution of the DDM in inverse cluster sample units.
+\item {\bf ddm\_freq\_len} (integer): Number of Doppler bins in the DDM, starting from (-{\bf ddm\_freq\_len}/2)*{\bf delta\_freq}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf lag\_ddm\_out} (double, array of {\bf ddm\_freq\_len} elements): DDM's delay slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_singlelag\_DDM\_remdir}
+
+Compute a DDM's delay slice from the waveform cluster after removing a longer coherent component to mitigate direct signal interference. The procedure is the same as doing an integration, but after modulating the waveforms using a phasor at a given set of frequencies.\\
+
+Example:\\
+
+\texttt{lag\_ddm\_out = my\_wavcluster.compute\_singlelag\_DDM\_remdir(coherent\_int, coherent\_int\_dir, lag\_pos, delta\_freq, ddm\_freq\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf coherent\_int\_dir} (integer): Number of samples of coherent integration for mitigation of direct signal interference (from 1 to {\bf cluster\_length}).
+\item {\bf lag\_pos} (integer): Delay lag of the output DDM slice.
+\item {\bf delta\_freq} (double): Doppler frequency resolution of the DDM in inverse cluster sample units.
+\item {\bf ddm\_freq\_len} (integer): Number of Doppler bins in the DDM, starting from (-{\bf ddm\_freq\_len}/2)*{\bf delta\_freq}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf lag\_ddm\_out} (double, array of {\bf ddm\_freq\_len} elements): DDM's delay slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_DopplerMap\_BW}
+
+Compute the 3~dB bandwidth from the DDM at the Doppler domain for a given lag.\\
+
+Example:\\
+
+\texttt{[pos\_max, pow\_max] = my\_wavcluster.compute\_DopplerMap\_BW(coherent\_int, lag\_pos, ddm\_freq\_len, delta\_freq)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf lag\_pos} (integer): Delay lag of the DDM slice.
+\item {\bf ddm\_freq\_len} (integer): Number of Doppler bins in the DDM, starting from (-{\bf ddm\_freq\_len}/2)*{\bf delta\_freq}.
+\item {\bf delta\_freq} (double): Doppler frequency resolution of the DDM in inverse cluster sample units.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf pos\_max} (double): Peak location of the DDM's delay slice in inverse sample units.
+\item {\bf pow\_max} (double): Peak value of the DDM's delay slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_DopplerMap\_BW\_remdir}
+
+Compute the 3~dB bandwidth from the DDM at the Doppler domain for a given lag and after removing a longer coherent component to mitigate direct signal interference.\\
+
+Example:\\
+
+\texttt{[pos\_max, pow\_max] = my\_wavcluster.compute\_DopplerMap\_BW\_remdir(coherent\_int, coherent\_int\_dir, lag\_pos, ddm\_freq\_len, delta\_freq)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf coherent\_int} (integer): Number of samples of coherent integration (from 1 to {\bf cluster\_length}). The complex waveforms are coherently integrated in blocks of {\bf coherent\_int} samples and the results are incoherently averaged.
+\item {\bf coherent\_int\_dir} (integer): Number of samples of coherent integration for mitigation of direct signal interference (from 1 to {\bf cluster\_length}).
+\item {\bf lag\_pos} (integer): Delay lag of the DDM slice.
+\item {\bf ddm\_freq\_len} (integer): Number of Doppler bins in the DDM, starting from (-{\bf ddm\_freq\_len}/2)*{\bf delta\_freq}.
+\item {\bf delta\_freq} (double): Doppler frequency resolution of the DDM in inverse cluster sample units.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf pos\_max} (double): Peak location of the DDM's delay slice in inverse cluster sample units.
+\item {\bf pow\_max} (double): Peak value of the DDM's delay slice in arbitrary units.
+\end{itemize}
+
+
+\subsection{compute\_LagHologram}
+
+Compute a lag-hologram delay slice from the waveform cluster. The procedure consist in computing the FFT algorithm from the time series at the given lag position from the cluster of waveforms.\\
+
+Example:\\
+
+\texttt{lag\_hologram\_out = my\_wavcluster.compute\_LagHologram(lag\_pos, fft\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lag\_pos} (integer): Delay lag of the output lag-hologram slice.
+\item {\bf fft\_len} (integer): Number of FFT samples (from 2 to {\bf cluster\_length}, being a power of 2).
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf lag\_hologram\_out} (double, array of {\bf fft\_len} elements): Lag-hologram delay slice in arbitrary units. The corresponding frequencies range from -(int({\bf fft\_len}/2) - 1) to int({\bf fft\_len}/2) in inverse cluster sample units.
+\end{itemize}
+
+
+\subsection{get\_wav\_length}
+
+Get the length of the waveforms stored.\\
+
+Example:\\
+
+\texttt{wav\_len\_out = my\_wavcluster.get\_wav\_length()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_len\_out} (integer): Length of the waveforms stored.
+\end{itemize}
+
+
+\subsection{get\_cluster\_length}
+
+Get the number of waveforms stored in the cluster.\\
+
+Example:\\
+
+\texttt{cluster\_len\_out = my\_wavcluster.get\_cluster\_length()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf cluster\_len\_out} (integer): Number of waveforms stored in the cluster.
+\end{itemize}
+

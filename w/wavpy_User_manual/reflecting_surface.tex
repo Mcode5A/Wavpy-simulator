@@ -1,0 +1,442 @@
+\chapter{Reflecting\_surface}\label{cha:surf}
+
+This class provides functions to characterize a reflecting surface in a radar scenario, in particular regarding its dielectric properties (based on {\bf [Ulaby et al, 90]}) and its roughness.\\
+
+Example of object construction with arbitrary name {\it my\_surface}:\\
+
+\texttt{my\_surface = wavpy.Reflecting\_surface()}\\
+
+In this case, public variables and functions from object {\it my\_surface} of class {\it Reflecting\_surface} can be respectively checked/modified or called with:\\
+
+\texttt{my\_surface.variable}\\
+
+\texttt{my\_surface.function()}\\
+
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf epsilon\_real} (double): Real part of relative permittivity without units. Default value: 73.423
+
+\item {\bf epsilon\_imag} (double): Imaginary part of relative permittivity without units. Default value: 56.067
+
+\item {\bf mss\_x} (double): Mean square slope at upwind direction over the reflecting surface without units. Default value: 0.0075
+
+\item {\bf mss\_y} (double): Mean square slope at crosswind direction over the reflecting surface without units. Default value: 0.0075
+
+\item {\bf sigma\_z} (double): Standard deviation of surface height in meters. Default value: 0.069
+
+\item {\bf c21\_coeff} (double): Gram-Charlier C21 coefficient for 5 m/s wind. Default value: -0.033
+
+\item {\bf c03\_coeff} (double): Gram-Charlier C03 coefficient for 5 m/s wind. Default value: -0.125
+
+\item {\bf wind\_U10\_speed} (double): Wind speed magnitude at 10 meters above the surface in m/sec. Default value: 5.0 
+
+\item {\bf wind\_U10\_azimuth} (double): Wind azimuth (clockwise starting from North) at 10 meters above the surface in degrees. The direction follows the meteorological convention (0$^\circ$ means wind coming from North). Default value: 0.0
+
+\item {\bf medium} (string): Brief description of the medium. Default value: "Sea water with T=15C and sal=35psu"
+\end{itemize}
+
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf freq\_GHz} (double): Frequency of the system in GHz. Default value: 1.57542 (GPS L1)
+
+\item {\bf surface\_spectrum} (double, 2D array of {\bf nx\_spec} x {\bf ny\_spec} elements): Spectrum of the surface. Default value: void
+
+\item {\bf kx\_spec} (double, array of {\bf nx\_spec} elements): Wavenumber's range of stored spectrum at upwind direction over the reflecting surface in meter$^{-1}$. Default value: void
+
+\item {\bf ky\_spec} (double, array of {\bf ny\_spec} elements): Wavenumber's range of stored spectrum at crosswind direction over the reflecting surface in meter$^{-1}$. Default value: void
+
+\item {\bf nx\_spec} (integer): Number of samples of stored spectrum at upwind direction over the reflecting surface. Default value: 0
+
+\item {\bf ny\_spec} (integer): Number of samples of stored spectrum at crosswind direction over the reflecting surface. Default value: 0
+
+\item {\bf k\_threshold} (double): Wavenumber's limit for the computation of MSS from the stored spectrum. Default value: $2\pi/3\lambda_\mathrm{L1}$
+
+\item {\bf wind\_U10\_speed\_grid} (double, 2D array of {\bf size\_lon\_wgrid} x {\bf size\_lat\_wgrid} elements): Grid of wind speeds at 10 meters above the surface in m/sec. Default value: void
+
+\item {\bf wind\_U10\_azimuth\_grid} (double, 2D array of {\bf size\_lon\_wgrid} x {\bf size\_lat\_wgrid} elements): Grid of wind azimuths at 10 meters above the surface in degrees. Default value: void
+
+\item {\bf lon\_wgrid} (double, array of {\bf size\_lon\_wgrid} elements): Longitude values of wind grid in degrees. Default value: void
+
+\item {\bf lat\_wgrid} (double, array of {\bf size\_lat\_wgrid} elements): Latitude values of wind grid in degrees. Default value: void
+
+\item {\bf size\_lon\_wgrid} (integer): Number of samples of longitudes in stored wind grid. Default value: 0
+
+\item {\bf size\_lat\_wgrid} (integer): Number of samples of latitudes in stored wind grid. Default value: 0
+
+\item {\bf use\_wind\_grid} (boolean): True - A wind grid is stored, False - There is no wind grid stored. Default value: False
+\end{itemize}
+
+
+\section{Functions}
+
+\subsection{dump\_parameters}
+
+Print relevant information about the object's content (public and private variables).\\
+
+Example:\\
+
+\texttt{my\_surface.dump\_parameters()}\\
+
+
+\subsection{set\_frequency}
+
+Set frequency of the system in GHz.\\
+
+Example:\\
+
+\texttt{my\_surface.set\_frequency(freq\_GHz)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf freq\_GHz} (double): Frequency in GHz.
+\end{itemize}
+
+
+\subsection{set\_k\_threshold}
+
+Set wavenumber's limit for the computation of MSS from the stored spectrum ($2\pi/3\lambda_\mathrm{L1}$ by default).\\
+
+Example:\\
+
+\texttt{my\_surface.set\_k\_threshold(k\_lim\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf k\_lim\_in} (double): Wavenumber's limit in meters$^{-1}$.
+\end{itemize}
+
+
+\subsection{set\_k\_threshold\_Brown}
+
+Set wavenumber's limit for the computation of MSS from the stored spectrum using {\bf [Brown, 78]}.\\
+
+Example:\\
+
+\texttt{my\_surface.set\_k\_threshold\_Brown(incidence)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incidence} (double): Incidence angle of incoming signal in degrees.
+\end{itemize}
+
+
+\subsection{get\_k\_threshold}
+
+Get wavenumber's limit internally stored.\\
+
+Example:\\
+
+\texttt{k\_lim\_out = my\_surface.get\_k\_threshold()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf k\_lim\_out} (double): wavenumber's limit internally stored in meters$^{-1}$.
+\end{itemize}
+
+
+\subsection{epsilon\_sea\_water}
+
+Set relative permittivity for sea water as a function of salinity and temperature.\\
+
+Example:\\
+
+\texttt{my\_surface.epsilon\_sea\_water(sal, temp)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf sal} (double): Salinity of sea water in psu.
+\item {\bf temp} (double): Temperature of sea water in C-degrees.
+\end{itemize}
+
+
+\subsection{epsilon\_sea\_ice}
+
+Set relative permittivity of sea ice as a function of brine.\\
+
+Example:\\
+
+\texttt{my\_surface.epsilon\_sea\_ice(brine)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf brine} (double): Brine volume of sea ice in 1/1000 units.
+\end{itemize}
+
+
+\subsection{epsilon\_dry\_snow}
+
+Set relative permittivity of dry snow as a function of snow density.\\
+
+Example:\\
+
+\texttt{my\_surface.epsilon\_dry\_snow(density)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf density} (double): Snow density of dry snow in gr/cm$^3$.
+\end{itemize}
+
+
+\subsection{epsilon\_wet\_snow}
+
+Set relative permittivity of wet snow as a function of snow density and water volume.\\
+
+Example:\\
+
+\texttt{my\_surface.epsilon\_wet\_snow(density, water\_vol)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf density} (double): Snow density of wet snow in gr/cm$^3$.
+\item {\bf water\_vol} (double): Water volume of wet snow in \%.
+\end{itemize}
+
+
+\subsection{compute\_Rfresnel\_linear}
+
+Compute the reflection Fresnel coefficients for linear polarizations.\\
+
+Example:\\
+
+\texttt{[rvv, rhh] = my\_surface.compute\_Rfresnel\_linear(incidence, epsilon\_up\_layer)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incidence} (double): Incidence angle of incoming signal in degrees.
+\item {\bf epsilon\_up\_layer} (double, array of 2 elements): Complex relative permittivity (real and imaginary parts) of layer above the reflecting surface. For air, simply set {\bf epsilon\_up\_layer} = [1.0, 0.0].
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf rvv} (double, array of 2 elements): Complex reflection coefficient for vertical polarization (real and imaginary parts).
+\item {\bf rhh} (double, array of 2 elements): Complex reflection coefficient for horizontal polarization (real and imaginary parts).
+\end{itemize}
+
+
+\subsection{compute\_Rfresnel\_circular}
+
+Compute the reflection Fresnel coefficients for circular polarizations.\\
+
+Example:\\
+
+\texttt{[rco, rcross] = my\_surface.compute\_Rfresnel\_circular(incidence, epsilon\_up\_layer)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incidence} (double): Incidence angle of incoming signal in degrees.
+\item {\bf epsilon\_up\_layer} (double, array of 2 elements): Complex relative permittivity (real and imaginary parts) of layer above the reflecting surface. For air, simply set {\bf epsilon\_up\_layer} = [1.0, 0.0].
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf rco} (double, array of 2 elements): Complex reflection coefficient for co-polar [RHCP for GPS] (real and imaginary parts).
+\item {\bf rcross} (double, array of 2 elements): Complex reflection coefficient for cross-polar [LHCP for GPS] (real and imaginary parts).
+\end{itemize}
+
+
+\subsection{compute\_Tfresnel\_linear}
+
+Compute the transmission Fresnel coefficients for linear polarizations.\\
+
+Example:\\
+
+\texttt{[tvv, thh] = my\_surface.compute\_Tfresnel\_linear(incidence, epsilon\_up\_layer)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incidence} (double): Incidence angle of incoming signal in degrees.
+\item {\bf epsilon\_up\_layer} (double, array of 2 elements): Complex relative permittivity (real and imaginary parts) of layer above the reflecting surface. For air, simply set {\bf epsilon\_up\_layer} = [1.0, 0.0].
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf tvv} (double, array of 2 elements): Complex transmission coefficient for vertical polarization (real and imaginary parts).
+\item {\bf thh} (double, array of 2 elements): Complex transmission coefficient for horizontal polarization (real and imaginary parts).
+\end{itemize}
+
+
+\subsection{compute\_Tfresnel\_circular}
+
+Compute the transmission Fresnel coefficients for circular polarizations.\\
+
+Example:\\
+
+\texttt{[tco, tcross] = my\_surface.compute\_Tfresnel\_circular(incidence, epsilon\_up\_layer)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf incidence} (double): Incidence angle of incoming signal in degrees.
+\item {\bf epsilon\_up\_layer} (double, array of 2 elements): Complex relative permittivity (real and imaginary parts) of layer above the reflecting surface. For air, simply set {\bf epsilon\_up\_layer} = [1.0, 0.0].
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf tco} (double, array of 2 elements): Complex transmission coefficient for co-polar [RHCP for GPS] (real and imaginary parts).
+\item {\bf tcross} (double, array of 2 elements): Complex transmission coefficient for cross-polar [LHCP for GPS] (real and imaginary parts).
+\end{itemize}
+
+
+\subsection{compute\_sea\_spectrum}
+
+Compute the sea spectrum based on {\bf [Elfouhaily et al, 97]}.\\
+
+Example:\\
+
+\texttt{my\_surface.compute\_sea\_spectrum(num\_samples, delta\_k, theta, omega)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf num\_samples} (integer): Number of samples of the generated spectrum in a single dimension.
+\item {\bf delta\_k} (double): Wavenumber's resolution of the generated spectrum in meter$^{-1}$.
+\item {\bf theta} (double): Wind waves angle in degrees.
+\item {\bf omega} (double): Wave age.
+\end{itemize}
+
+
+\subsection{set\_surf\_spectrum}
+
+Set sea surface spectrum with a constant wavenumber's resolution.\\
+
+Example:\\
+
+\texttt{my\_surface.set\_surf\_spectrum(spectrum, kx\_in, ky\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf spectrum} (double, 2-D array of MxN elements): Sea surface spectrum.
+\item {\bf kx\_in} (double, array of M elements): Wavenumber's range of spectrum at upwind direction over the reflecting surface in meter$^{-1}$ (a non-repetitive ascending sequence is required for a proper computation of MSS).
+\item {\bf ky\_in} (double, array of N elements): Wavenumber's range of spectrum at crosswind direction over the reflecting surface in meter$^{-1}$ (a non-repetitive ascending sequence is required for a proper computation of MSS).
+\end{itemize}
+
+
+\subsection{set\_surf\_spectrum\_omnidir}
+
+Set omnidirectional sea surface with a constant wavenumber's resolution.\\
+
+Example:\\
+
+\texttt{my\_surface.set\_surf\_spectrum\_omnidir(spectrum, kr\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf spectrum} (double, array of N elements): Sea surface spectrum.
+\item {\bf kr\_in} (double, array of N elements): Wavenumber's range of omnidirectional spectrum in meter$^{-1}$ (a non-repetitive ascending sequence is required for a proper computation of MSS).
+\end{itemize}
+
+
+\subsection{get\_surf\_spectrum}
+
+Get value from stored sea surface spectrum as a function of grid's position.\\
+
+Example:\\
+
+\texttt{[kx, ky, spec\_val] = my\_surface.get\_surf\_spectrum(x, y)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf x} (integer): Sample index at upwind direction over the reflecting surface.
+\item {\bf y} (integer): Sample index at crosswind direction over the reflecting surface.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf kx} (double): Wavenumber at sample {\bf x} in meter$^{-1}$.
+\item {\bf ky} (double): Wavenumber at sample {\bf y} in meter$^{-1}$.
+\item {\bf spec\_val} (double): Spectrum value at sample ({\bf x}, {\bf y}).
+\end{itemize}
+
+
+\subsection{get\_surf\_spectrum\_omnidir}
+
+Get value from stored sea surface spectrum as a function of array's position.\\
+
+Example:\\
+
+\texttt{[kr, spec\_val] = my\_surface.get\_surf\_spectrum\_omnidir(r)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf r} (integer): Sample index in the omnidirectional array.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf kr} (double): Wavenumber at sample {\bf r} in meter$^{-1}$.
+\item {\bf spec\_val} (double): Spectrum value at sample {\bf r}.
+\end{itemize}
+
+
+\subsection{compute\_mss\_from\_spectrum}
+
+Compute MSS from the stored spectrum.\\
+
+Example:\\
+
+\texttt{my\_surface.compute\_mss\_from\_spectrum()}\\
+
+
+\subsection{compute\_mss\_from\_wind}
+
+Compute MSS from the wind speed parameters based on {\bf [Katzberg et al, 2006]}.\\
+
+Example:\\
+
+\texttt{my\_surface.compute\_mss\_from\_wind()}\\
+
+
+\subsection{set\_wind\_grid}
+
+Store an inhomogeneous wind grid as a function of latitude and longitude.\\
+
+Example:\\
+
+\texttt{my\_surface.set\_wind\_grid(wind\_speed\_grid, wind\_azim\_grid, longitudes, latitudes)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wind\_speed\_grid} (double, 2-D array of MxN elements): Grid of wind speeds at 10 meters above the surface in m/sec.
+\item {\bf wind\_azim\_grid} (double, 2-D array of MxN elements): Grid of wind azimuths at 10 meters above the surface in degrees.
+\item {\bf longitudes} (double, array of M elements): Longitude values of wind grid in degrees.
+\item {\bf latitudes} (double, array of N elements): Latitude values of wind grid in degrees.
+\end{itemize}
+
+
+\subsection{interp\_wind\_grid}
+
+Interpolate wind speed and wind azimuth from stored wind grid and store the results obtained in public variables {\bf wind\_U10\_speed} and {\bf wind\_U10\_azimuth} respectively.\\
+
+\texttt{my\_surface.interp\_wind\_grid(lon\_in, lat\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lon\_in} (double): Longitude coordinate for interpolation of the wind grid in degrees.
+\item {\bf lat\_in} (double): Latitude coordinate for interpolation of the wind grid in degrees.
+\end{itemize}
+
+
+\subsection{disable\_wind\_grid}
+
+Remove stored wind grid.\\
+
+Example:\\
+
+\texttt{my\_surface.disable\_wind\_grid()}\\
+
+
+\subsection{get\_wind\_grid\_status}
+
+Return current status of stored wind grid.\\
+
+Example:\\
+
+\texttt{status = my\_surface.get\_wind\_grid\_status()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf status} (boolean): True - There is a wind grid stored, False - There is no wind grid stored.
+\end{itemize}
+

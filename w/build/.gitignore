@@ -1,0 +1,13 @@
+CMakeCache.txt
+CMakeDoxyfile.in
+CMakeDoxygenDefaults.cmake
+CMakeFiles/
+cmake_install.cmake
+docs/
+examples/
+prova/
+src/
+waveform_pylib_config.h
+Testing/
+test/
+install_manifest.txt

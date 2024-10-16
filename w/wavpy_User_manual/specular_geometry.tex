@@ -1,0 +1,632 @@
+\chapter{Specular\_geometry}\label{cha:geom}
+
+This class provides functions to characterize a reflectometry scenario composed by a transmitter, a receiver and their corresponding specular point over a model of the Earth surface (ellipsoid WGS84 + a given undulation).\\
+
+Example of object construction with arbitrary name {\it my\_geom}:\\
+
+\texttt{my\_geom = wavpy.Specular\_geometry()}\\
+
+In this case, public variables and functions from object {\it my\_geom} of class {\it Specular\_geometry} can be respectively checked/modified or called with:\\
+
+\texttt{my\_geom.variable}\\
+
+\texttt{my\_geom.function()}\\
+
+\section{Additional information}
+
+{\bf Receiver frame}: The receiver body frame is a Cartesian coordinates system of the structure containing the receiver, typically a satellite or an aircraft, where the X-axis points towards the front, the Y-axis points towards the right-side (XY define the horizontal plane) and the Z-axis towards Nadir. In abscense of inertial rotation of the body frame, we will assume that the X-axis points towards the Earth's North and the Z-axis points towards the Earth's center.\\
+
+{\bf Local frame}: The local frame is a Cartesian coordinates system with its origin at the specular point, X- and Y-axis defining the horizontal plane parallel to the surface, with the Y-axis pointing towards the transmitter, and the Z-axis pointing to Zenith by complying the right-hand rule.
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf longitudeS} (double): Longitude coordinate of the specular point in degrees. Default value: 0.0
+
+\item {\bf latitudeS} (double): Latitude coordinate of the specular point in degrees. Default value: 0.0
+
+\item {\bf elevation} (double): Elevation angle of the transmitter at the specular point in degrees. Default value: 90.0
+
+a\item {\bf azimuthR} (double): Azimuth angle of the receiver at the specular point in degrees. Default value: 0.0
+
+\item {\bf azimuthT} (double): Azimuth angle of the transmitter at the specular point in degrees. Default value: 0.0
+
+\item {\bf geometric\_delay} (double): Delay path difference between transmitter-specular-receiver and transmitter-receiver in km. Default value: 6.0
+\end{itemize}
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf posR\_ECEF} (double, array of 3 elements): Position of the receiver in ECEF coordinates in km. Default value: [6381.137, 0.0, 0.0]
+
+\item {\bf posT\_ECEF} (double, array of 3 elements): Position of the transmitter in ECEF coordinates in km. Default value: [26378.137, 0.0, 0.0]
+
+\item {\bf velR\_ECEF} (double, array of 3 elements): Velocity vector of the receiver in ECEF coordinates in km/s. Default value: [0.0, 0.0, 0.0]
+
+\item {\bf velT\_ECEF} (double, array of 3 elements): Velocity vector of the transmitter in ECEF coordinates in km/s. Default value: [0.0, 0.0, 0.0]
+
+\item {\bf posS\_ECEF} (double, array of 3 elements): Position of the specular point in ECEF coordinates in km. Default value: [6378.137, 0.0, 0.0]
+
+\item {\bf longitudeR} (double): Longitude coordinate of the receiver in degrees. Default value: 0.0
+
+\item {\bf latitudeR} (double): Latitude coordinate of the receiver in degrees. Default value: 0.0
+
+\item {\bf longitudeT} (double): Longitude coordinate of the transmitter in degrees. Default value: 0.0
+
+\item {\bf latitudeT} (double): Latitude coordinate of the transmitter in degrees. Default value: 0.0
+
+\item {\bf heightR} (double): Height of the receiver with respect to ellipsoid WGS84 in km. Default value: 3.0
+
+\item {\bf heightT} (double): Height of the transmitter with respect to ellipsoid WGS84 in km. Default value: 20000.0
+
+\item {\bf local\_heightR} (double): Height of the receiver in the local frame in km. Default value: 3.0
+
+\item {\bf local\_heightT} (double): Height of the transmitter in the local frame in km. Default value: 3.0
+
+\item {\bf undulation} (double): Vertical height offset of the specular point with respect to ellipsoid WGS84 in km. Default value: 0.0
+
+\item {\bf roll} (double): Inertial rotation of the X-axis (positive clockwise) of the receiver body frame in degrees. Default value: 0.0
+
+\item {\bf pitch} (double): Inertial rotation of the Y-axis (positive clockwise) of the receiver body frame in degrees. Default value: 0.0
+
+\item {\bf heading} (double): Inertial rotation of the Z-axis (positive clockwise) of the receiver body frame with respect to North in degrees. Default value: 0.0
+\end{itemize}
+
+\section{Functions}
+
+\subsection{dump\_parameters}
+
+Print relevant information about the object's content (public and private variables).\\
+
+Example:\\
+
+\texttt{my\_geom.dump\_parameters()}\\
+
+
+\subsection{set\_ECEFpos\_Receiver}
+
+Set the position of the receiver in ECEF coordinates. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_ECEFpos\_Receiver(posR\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf posR\_in} (double, array of 3 elements): Position of the receiver in ECEF coordinates in km.
+\end{itemize}
+
+\subsection{get\_ECEFpos\_Receiver}
+
+Get the position of the receiver in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{posR\_out = my\_geom.get\_ECEFpos\_Receiver()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf posR\_out} (double, array of 3 elements): Position of the receiver in ECEF coordinates in km.
+\end{itemize}
+
+
+\subsection{set\_ECEFvel\_Receiver}
+
+Set the velocity vector of the receiver in ECEF coordinates. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_ECEFvel\_Receiver(velR\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf velR\_in} (double, array of 3 elements): Velocity vector of the receiver in ECEF coordinates in km/s.
+\end{itemize}
+
+
+\subsection{get\_ECEFvel\_Receiver}
+
+Get the position of the receiver in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{velR\_out = my\_geom.get\_ECEFvel\_Receiver()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf velR\_out} (double, array of 3 elements): Velocity vector of the receiver in ECEF coordinates in km/s.
+\end{itemize}
+
+
+\subsection{set\_ECEFpos\_Transmitter}
+
+Set the position of the transmitter in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_ECEFpos\_Transmitter(posT\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf posT\_in} (double, array of 3 elements): Position of the transmitter in ECEF coordinates in km.
+\end{itemize}
+
+
+\subsection{get\_ECEFpos\_Transmitter}
+
+Get the position of the transmitter in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{posT\_out = my\_geom.get\_ECEFpos\_Transmitter()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf posT\_out} (double, array of 3 elements): Position of the transmitter in ECEF coordinates in km.
+\end{itemize}
+
+
+\subsection{set\_ECEFvel\_Transmitter}
+
+Set the velocity vector of the transmitter in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_ECEFvel\_Transmitter(velT\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf velT\_in} (double, array of 3 elements): Velocity vector of the transmitter in ECEF coordinates in km/s.
+\end{itemize}
+
+
+\subsection{get\_ECEFvel\_Transmitter}
+
+Get the position of the transmitter in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{velT\_out = my\_geom.get\_ECEFvel\_Transmitter()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf velT\_out} (double, array of 3 elements): Velocity vector of the transmitter in ECEF coordinates in km/s.
+\end{itemize}
+
+
+\subsection{get\_ECEFpos\_Specular}
+
+Get the position of the specular point in ECEF coordinates.\\
+
+Example:\\
+
+\texttt{posS\_out = my\_geom.get\_ECEFpos\_Specular()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf posS\_out} (double, array of 3 elements): Position of the specular point in ECEF coordinates in km.
+\end{itemize}
+
+
+\subsection{set\_LongLatHeight\_Receiver}
+
+Set the position of the receiver with Longitude-Latitude-Height coordinates. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_LongLatHeight\_Receiver([lonR\_in, latR\_in, heightR\_in])}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lonR\_in} (double): Longitude coordinate of the receiver in degrees.
+\item {\bf latR\_in} (double): Latitude coordinate of the receiver in degrees.
+\item {\bf heightR\_in} (double): Height of the receiver with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{get\_LongLatHeight\_Receiver}
+
+Get the position of the receiver with Longitude-Latitude-Height coordinates.\\
+
+Example:\\
+
+\texttt{[lonR\_out, latR\_out, heightR\_out] = my\_geom.get\_LongLatHeight\_Receiver()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf lonR\_out} (double): Longitude coordinate of the receiver in degrees.
+\item {\bf latR\_out} (double): Latitude coordinate of the receiver in degrees.
+\item {\bf heightR\_out} (double): Height of the receiver with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+\subsection{set\_LongLatHeight\_Transmitter}
+
+Set the position of the transmitter with Longitude-Latitude-Height coordinates.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_LongLatHeight\_Transmitter([lonT\_in, latT\_in, heightT\_in])}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf lonT\_in} (double): Longitude coordinate of the transmitter in degrees.
+\item {\bf latT\_in} (double): Latitude coordinate of the transmitter in degrees.
+\item {\bf heightT\_in} (double): Height of the transmitter with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{get\_LongLatHeight\_Transmitter}
+
+Get the position of the transmitter with Longitude-Latitude-Height coordinates.\\
+
+Example:\\
+
+\texttt{[lonT\_out, latT\_out, heightT\_out] = my\_geom.get\_LongLatHeight\_Transmitter()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf lonT\_out} (double): Longitude coordinate of the transmitter in degrees.
+\item {\bf latT\_out} (double): Latitude coordinate of the transmitter in degrees.
+\item {\bf heightT\_out} (double): Height of the transmitter with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{set\_geometry\_from\_ElevHeightsSpec}
+
+Set the geometry of the different elements from their heights, the elevation and azimuth angles, and the location of the specular point in Longitude-Latitude coordinates. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_geometry\_from\_ElevHeightsSpec(elev\_in, heightR\_in, heightT\_in, lonS\_in, latS\_in, azimT\_in, heightS\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf elev\_in} (double): Elevation angle of the transmitter at the specular point in degrees.
+\item {\bf heightR\_in} (double): Height of the receiver with respect to ellipsoid WGS84 in km.
+\item {\bf heightT\_in} (double): Height of the transmitter with respect to ellipsoid WGS84 in km.
+\item {\bf lonS\_in} (double): Longitude coordinate of the specular point in degrees.
+\item {\bf latS\_in} (double): Latitude coordinate of the specular point in degrees.
+\item {\bf azimT\_in} (double): Azimuth angle of the transmitter at the specular point in degrees.
+\item {\bf heightS\_in} (double): Vertical height offset of the specular point with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{set\_tangEarthVel\_Receiver}
+
+Set a velocity vector for the receiver tangential to the Earth surface. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_tangEarthVel\_Receiver(velocity, specAzim)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf velocity} (double): Speed of the receiver in km/s.
+\item {\bf specAzim} (double): Clockwise azimuth angle with respect to the pointing direction towards the specular point in degrees.
+\end{itemize}
+
+
+\subsection{set\_tangEarthVel\_Transmitter}
+
+Set a velocity vector for the transmitter tangential to the Earth surface.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_tangEarthVel\_Transmitter(velocity, specAzim)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf velocity} (double): Speed of the transmitter in km/s.
+\item {\bf specAzim} (double): Clockwise azimuth angle with respect to the pointing direction towards the specular point in degrees.
+\end{itemize}
+
+
+\subsection{set\_Undulation}
+
+Set a vertical height offset of the specular point with respect to ellipsoid WGS84.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_Undulation(undu\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf undu\_in} (double): Vertical height offset of the specular point with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{get\_Undulation}
+
+Get the vertical height offset of the specular point with respect to ellipsoid WGS84.\\
+
+Example:\\
+
+\texttt{undu\_out = my\_geom.get\_Undulation()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf undu\_out} (double): Vertical height offset of the specular point with respect to ellipsoid WGS84 in km.
+\end{itemize}
+
+
+\subsection{read\_ECEFpos\_Receiver}
+
+Set the ECEF position and velocity of the receiver from an ASCII file of five columns containing the following variables: GPS\_week - Second\_of\_week - Position\_X\_km - Position\_Y\_km - Position\_Z\_km. Interpolation is applied when required. The orientation of the Z-axis of the receiver body frame with respect to North ({\bf heading}) is updated with the receiver's position and flight direction.\\
+
+Example:\\
+
+\texttt{my\_geom.read\_ECEFpos\_Receiver(file, week, sow)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf file} (string): Filename of the ASCII file containing the time series of the receiver's ECEF position.
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\end{itemize}
+
+
+\subsection{read\_ECEFpos\_Transmitter}
+
+Set the ECEF position and velocity of the transmitter from an ASCII file of five columns containing the following variables: GPS\_week - Second\_of\_week - Position\_X\_km - Position\_Y\_km - Position\_Z\_km. Interpolation is applied when required.\\
+
+Example:\\
+
+\texttt{my\_geom.read\_ECEFpos\_Transmitter(file, week, sow)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf file} (string): Filename of the ASCII file containing the time series of the transmitter's ECEF position.
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\end{itemize}
+
+
+\subsection{read\_ECEFpos\_GNSS\_Transmitter}
+
+Set the ECEF position and velocity of a GNSS transmitter from a SP3 file. If several reads have to be done at the same SP3 file, it is better to use {\it load\_sp3File}, {\it read\_ECEFpos\_GNSS\_Transmitter\_sp3Loaded} and {\it free\_sp3File}.\\
+
+Example:\\
+
+\texttt{my\_geom.read\_ECEFpos\_GNSS\_Transmitter(sp3\_file, week, sow, prn, gnss\_ident)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf sp3\_file} (string): Filename of the SP3 file containing ECEF positions of several GNSS satellites.
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\item {\bf prn} (integer): PRN of the desired GNSS satellite.
+\item {\bf gnss\_ident} (char): GNSS identifier ('G' for GPS, 'E' for Galileo, 'C' for Beidou, 'R' for GLONASS and 'J' for QZSS).
+\end{itemize}
+
+
+\subsection{load\_sp3File}
+
+Load the orbits of a single GNSS from a SP3 file.\\
+
+Example:\\
+
+\texttt{my\_geom.load\_sp3File(sp3\_file, gnss\_ident)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf sp3\_file} (string): Filename of the SP3 file containing ECEF positions of several GNSS satellites.
+\item {\bf gnss\_ident} (char): GNSS identifier ('G' for GPS, 'E' for Galileo, 'C' for Beidou, 'R' for GLONASS and 'J' for QZSS).
+\end{itemize}
+
+
+\subsection{free\_sp3File}
+
+Free from memory previous loaded orbits of a single GNSS from a SP3 file.\\
+
+Example:\\
+
+\texttt{my\_geom.free\_sp3File()}\\
+
+
+\subsection{read\_ECEFpos\_GNSS\_Transmitter\_sp3Loaded}
+
+Set the ECEF position and velocity of a GNSS transmitter from a previously loaded SP3 file.\\
+
+Example:\\
+
+\texttt{my\_geom.read\_ECEFpos\_GNSS\_Transmitter\_sp3Loaded(week, sow, prn, gnss\_ident)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\item {\bf prn} (integer): PRN of the desired GNSS satellite.
+\item {\bf gnss\_ident} (char): GNSS identifier ('G' for GPS, 'E' for Galileo, 'C' for Beidou, 'R' for GLONASS and 'J' for QZSS).
+\end{itemize}
+
+
+\subsection{compute\_specular\_point}
+
+Compute the specular point from the positions of transmitter and receiver over the ellipsoid WGS84 plus a given undulation by increasing both semi-axis with such value.\\
+
+Example:\\
+
+\texttt{my\_geom.compute\_specular\_point(compute\_undu)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf compute\_undu} (char): "1" to interpolate undulation from EGM96 stored grid and "0" to do not compute undulation.
+\end{itemize}
+
+
+\subsection{compute\_specular\_point\_Undu\_Spherical\_Earth}
+
+Compute the specular point from the positions of transmitter and receiver over the ellipsoid WGS84 plus a given undulation by increasing the radius of curvature at initial specular position over WGS84.\\
+
+Example:\\
+
+\texttt{my\_geom.compute\_specular\_point\_Undu\_Spherical\_Earth()}\\
+
+
+\subsection{compute\_ElevAzimT\_from\_receiver}
+
+Compute elevation and azimuth angles of the transmitter as seen from the receiver's point of view.\\
+
+Example:\\
+
+\texttt{[elevT\_R, azimT\_R] = my\_geom.compute\_ElevAzimT\_from\_receiver()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf elevT\_R} (double): Elevation angle of the transmitter from the receiver's point of view in degrees.
+\item {\bf azimT\_R} (double): Azimuth angle of the transmitter from the receiver's point of view in degrees.
+\end{itemize}
+
+
+\subsection{set\_inertials}
+
+Set the inertial rotation of the receiver, including its orientation with respect to North.\\
+
+Example:\\
+
+\texttt{my\_geom.set\_inertials(roll\_in, pitch\_in, heading\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf roll\_in} (double): Inertial rotation of the X-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf pitch\_in} (double): Inertial rotation of the Y-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf heading\_in} (double): Inertial rotation of the Z-axis (positive clockwise) of the receiver body frame with respect to North in degrees.
+\end{itemize}
+
+
+\subsection{get\_inertials}
+
+Get the stored inertial rotation of the receiver.\\
+
+Example:\\
+
+\texttt{[roll\_out, pitch\_out, heading\_out] = my\_geom.get\_inertials()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf roll\_out} (double): Inertial rotation of the X-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf pitch\_out} (double): Inertial rotation of the Y-axis (positive clockwise) of the receiver body frame in degrees.
+\item {\bf heading\_out} (double): Inertial rotation of the Z-axis (positive clockwise) of the receiver body frame with respect to North in degrees.
+\end{itemize}
+
+
+\subsection{rotate\_vector\_BF\_to\_local}
+
+Rotate an input vector in the receiver body frame to the local frame's orientation (it is not a change of coordinates).\\
+
+Example:\\
+
+\texttt{vector\_local\_out = my\_geom.rotate\_vector\_BF\_to\_local(vector\_BF\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_BF\_in} (double, array of 3 elements): Input vector in the receiver body frame.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf vector\_local\_out} (double, array of 3 elements): Output vector with the local frame's orientation.
+\end{itemize}
+
+
+\subsection{rotate\_vector\_BF\_to\_ECEF}
+
+Rotate an input vector in the receiver body frame to ECEF orientation (it is not a change of coordinates).\\
+
+Example:\\
+
+\texttt{vector\_ECEF\_out = my\_geom.rotate\_vector\_BF\_to\_ECEF(vector\_BF\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_BF\_in} (double, array of 3 elements): Input vector in the receiver body frame.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf vector\_ECEF\_out} (double, array of 3 elements): Output vector with ECEF orientation.
+\end{itemize}
+
+
+\subsection{compute\_inertial\_delay}
+
+Compute the projection of an input vector in the receiver body frame into the reflected signal's delay path.\\
+
+Example:\\
+
+\texttt{inertdel = my\_geom.compute\_inertial\_delay(vector\_BF\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_BF\_in} (double, array of 3 elements): Input vector in the receiver body frame.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf inertdel} (double): Projection of the input vector into the reflected signal's delay path in the same units as vector\_BF\_in.
+\end{itemize}
+
+
+\subsection{read\_Inertials\_Receiver}
+
+Set the inertial rotation of the receiver from an ASCII file of five columns containing the following variables: GPS\_week - Second\_of\_week - roll\_deg - pitch\_deg - yaw\_deg. Interpolation is applied when required.\\
+
+Example:\\
+
+\texttt{my\_geom.read\_Inertials\_Receiver(file, week, sow)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf file} (string): Filename of the ASCII file containing the time series of the receiver's inertial rotation.
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\end{itemize}
+
+
+\subsection{compute\_Beyerle\_windup\_direct}
+
+Compute the carrier phase wind-up of the up-looking antenna (collecting direct GNSS signals) based on {\bf [Beyerle, 09]}.\\
+
+Example:\\
+
+\texttt{[windup\_R, windup\_L] = my\_geom.compute\_Beyerle\_windup\_direct(vector\_r\_a\_BF, double vector\_r\_t\_BF, int week, double sow)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_r\_a\_BF} (double, array of 3 elements): Antenna vector r\_a (as in {\bf [Beyerle, 09]}) in the receiver body frame.
+\item {\bf vector\_r\_t\_BF} (double, array of 3 elements): Antenna vector r\_t (as in {\bf [Beyerle, 09]}) in the receiver body frame.
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf windup\_R} (double): Carrier phase wind-up for RHCP polarization in radians.
+\item {\bf windup\_L} (double): Carrier phase wind-up for LHCP polarization in radians.
+\end{itemize}
+
+
+\subsection{compute\_Beyerle\_windup\_reflected}
+
+Compute the carrier phase wind-up of the down-looking antenna (collecting reflected GNSS signals) based on {\bf [Beyerle, 09]}.\\
+
+Example:\\
+
+\texttt{[windup\_R, windup\_L] = my\_geom.compute\_Beyerle\_windup\_reflected(vector\_r\_a\_BF, vector\_r\_t\_BF, rvv, rhh, week, sow)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf vector\_r\_a\_BF} (double, array of 3 elements): Antenna vector r\_a (as in {\bf [Beyerle, 09]}) in the receiver body frame.
+\item {\bf vector\_r\_t\_BF} (double, array of 3 elements): Antenna vector r\_t (as in {\bf [Beyerle, 09]}) in the receiver body frame.
+\item {\bf rvv} (double, array of 2 elements): Complex reflection coefficient for vertical polarization (real and imaginary parts).
+\item {\bf rhh} (double, array of 2 elements): Complex reflection coefficient for horizontal polarization (real and imaginary parts).
+\item {\bf week} (integer): GPS week.
+\item {\bf sow} (double): GPS second of the week.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf windup\_R} (double): Carrier phase wind-up for RHCP polarization in radians.
+\item {\bf windup\_L} (double): Carrier phase wind-up for LHCP polarization in radians.
+\end{itemize}
+

@@ -1,0 +1,216 @@
+\chapter{MRSR\_Model}\label{cha:MRSRmodel}
+
+This class models GNSS-R complex waveforms in a scenario with several reflecting layers. This model, referred as Multiple Ray - Single
+Reflection (MRSR), constructs the reflected signal as a complex sum of single coherent reflections coming from a set of layer interfaces (one reflection from each layer). Such approach was successfully tested in an Antarctic campaign {\bf [Cardellach et al, 12]}.\\
+
+Example of object construction with arbitrary name {\it my\_model\_layers}:\\
+
+\texttt{my\_model\_layers = wavpy.MRSR\_Model()}\\
+
+In this case, public variables (including objects) and functions from object {\it my\_model\_layers} of class {\it MRSR\_Model} can be respectively checked/modified or called with:\\
+
+\texttt{my\_model\_layers.variable}\\
+
+\texttt{my\_model\_layers.function()}\\
+
+\texttt{my\_model\_layers.object\_A.variable\_from\_object\_A}\\
+
+\texttt{my\_model\_layers.object\_A.function\_from\_object\_A()}\\
+
+
+\section{Additional information}
+
+{\bf Surface frame}: The surface frame is a Cartesian coordinates system with its origin at the vertical projection of the receiver's location towards the surface level, X- and Y-axis defining the horizontal plane parallel to the surface, with the X-axis pointing towards North, and the Z-axis pointing to Zenith by complying the right-hand rule.
+
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf receiver} (object of class {\it RF\_FrontEnd}~[\ref{cha:rffe}]): Object characterizing the receiver front-end (collecting reflected GNSS signals) used during the simulation.
+
+\item {\bf gnss\_signal} (object of class {\it GNSS\_composite}~[\ref{cha:gnss}]): Object characterizing the GNSS signal used during the simulation.
+
+\item {\bf waveforms} (object of class {\it Waveform\_complex\_cluster}~[\ref{cha:wavcom}]): Object that stores the simulated cluster of complex waveforms with functions for data analysis.
+\end{itemize}
+
+
+\section{Relevant private variables}
+
+\begin{itemize} 
+\item {\bf num\_layers} (integer): Number of layers. Default value: 0
+
+\item {\bf height\_z} (integer): Height of the receiver with respect of the surface level (or its position in the Z-axis of the surface frame) in meters. Default value: 0
+
+\item {\bf depth\_layer} (double, array of {\bf num\_layers} elements): Initial depth level of the different layers at the Z-axis of the surface frame in meters. Note that positive values refer to negative values in the Z-axis' positions (e.g. 10 meters depth means -10 meters in the Z-axis of the surface frame). Default value: void
+
+\item {\bf alpha\_x} (double, array of {\bf num\_layers} elements): Rotation angle in the X-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame). Default value: void
+
+\item {\bf alpha\_y} (double, array of {\bf num\_layers} elements): Rotation angle in the Y-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame). Default value: void
+
+\item {\bf epsilon\_r} (double, array of {\bf num\_layers} elements): Real part of relative permittivity of the different layers without units. Default value: void
+
+\item {\bf epsilon\_i} (double, array of {\bf num\_layers} elements): Imaginary part of relative permittivity of the different layers without units. Default value: void
+\end{itemize}
+
+
+\section{Functions}
+
+\subsection{set\_general\_scenario}
+
+Characterize a multiple-layer scenario.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.set\_general\_scenario(height\_in, depths\_in, alpha\_x\_in, alpha\_y\_in, epsilon\_r\_in, epsilon\_i\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf height\_in} (double): Height of the receiver with respect of the surface level (or its position in the Z-axis of the surface frame) in meters.
+\item {\bf depths\_in} (double, array of N elements): Initial depth level of the different layers at the Z-axis of the surface frame in meters.
+\item {\bf alpha\_x\_in} (double, array of N elements): Rotation angle in the X-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame).
+\item {\bf alpha\_y\_in} (double, array of N elements): Rotation angle in the Y-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame).
+\item {\bf epsilon\_r\_in} (double, array of N elements): Real part of relative permittivity of the different layers without units.
+\item {\bf epsilon\_i\_in} (double, array of N elements): Imaginary part of relative permittivity of the different layers without units.
+\end{itemize}
+
+
+\subsection{set\_planar\_layers\_scenario}
+
+Characterize a multiple-layer scenario where all layers are parallel to the XY-plane of the surface frame.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.set\_planar\_layers\_scenario(height\_in, depths\_in, epsilon\_r\_in, epsilon\_i\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf height\_in} (double): Height of the receiver with respect of the surface level (or its position in the Z-axis of the surface frame) in meters.
+\item {\bf depths\_in} (double, array of N elements): Initial depth level of the different layers at the Z-axis of the surface frame in meters.
+\item {\bf epsilon\_r\_in} (double, array of N elements): Real part of relative permittivity of the different layers without units.
+\item {\bf epsilon\_i\_in} (double, array of N elements): Imaginary part of relative permittivity of the different layers without units.
+\end{itemize}
+
+
+\subsection{set\_dry\_snow\_planar\_layers\_scenario}
+
+Characterize a dry snow multiple-layer scenario where all layers are parallel to the XY-plane of the surface frame.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.set\_dry\_snow\_planar\_layers\_scenario(height\_in, depths\_in, snow\_dens\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf height\_in} (double): Height of the receiver with respect of the surface level (or its position in the Z-axis of the surface frame) in meters.
+\item {\bf depths\_in} (double, array of N elements): Initial depth level of the different layers at the Z-axis of the surface frame in meters.
+\item {\bf snow\_dens\_in} (double, array of N elements): Snow density of the different layers in gr/cm$^3$ units.
+\end{itemize}
+
+
+\subsection{mod\_height\_depths}
+
+Modify the height of the receiver and the depths of the layers in the already characterized scenario.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.mod\_height\_depths(height\_in, depths\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf height\_in} (double): Height of the receiver with respect of the surface level (or its position in the Z-axis of the surface frame) in meters.
+\item {\bf depths\_in} (double, array of {\bf num\_layers} elements): Initial depth level of the different layers at the Z-axis of the surface frame in meters.
+\end{itemize}
+
+
+\subsection{mod\_alphas}
+
+Modify the rotation angles of the layers in the already characterized scenario.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.mod\_alphas(alpha\_x\_in, alpha\_y\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf alpha\_x\_in} (double, array of N elements): Rotation angle in the X-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame).
+\item {\bf alpha\_y\_in} (double, array of N elements): Rotation angle in the Y-axis of the surface frame of the different layers in degrees (following right-hand rule with the surface frame).
+\end{itemize}
+
+
+\subsection{mod\_epsilon}
+
+Modify the permittivity of the layers in the already characterized scenario.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.mod\_epsilon(epsilon\_r\_in, epsilon\_i\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf epsilon\_r\_in} (double, array of {\bf num\_layers} elements): Real part of relative permittivity of the different layers without units.
+\item {\bf epsilon\_i\_in} (double, array of {\bf num\_layers} elements): Imaginary part of relative permittivity of the different layers without units.
+\end{itemize}
+
+
+\subsection{compute\_GNSS\_wavcluster}
+
+Simulate a cluster of complex waveforms for the characterized scenario.\\
+
+Example:\\
+
+\texttt{my\_model\_layers.compute\_GNSS\_wavcluster(wav\_lags, lag\_direct\_pos, sampling\_rate, elevations, azimuths)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_lags} (integer): Size of the waveforms stored in the simulated cluster.
+\item {\bf lag\_direct\_pos} (integer): Lag position corresponding to the direct signal's peak in the simulated waveform's range.
+\item {\bf sampling\_rate} (double): Sampling rate of the waveforms from the simulated cluster in samples/sec.
+\item {\bf elevations} (double, array of N elements): Elevation of the incident GNSS signal at the surface level for each sample of the simulated cluster in degrees.
+\item {\bf azimuths} (double, array of N elements): Azimuth of the incident GNSS signal at the surface level for each sample of the simulated cluster in degrees.
+\end{itemize}
+
+
+\subsection{compute\_LH\_freqs\_and\_depths}
+
+Compute the relationship between interferometric frequency and depth in the resultant lag-hologram (obtained from a simulated waveforms cluster) for the characterized scenario.\\
+
+Example:\\
+
+\texttt{[freq\_LH, depth\_LH] = my\_model\_layers.compute\_LH\_freqs\_and\_depths(elev\_range, azim\_range, time\_range, samples\_freq\_LH, samples\_depth\_LH)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf elev\_range} (double, array of 2 elements): Elevation range (initial and final values) of the incident GNSS signal at the surface level for the simulated cluster in degrees.
+\item {\bf azim\_range} (double, array of 2 elements): Azimuth range (initial and final values) of the incident GNSS signal at the surface level for the simulated cluster in degrees.
+\item {\bf time\_range} (double, array of 2 elements): Time range (initial and final values) of the simulated cluster in seconds.
+\item {\bf samples\_freq\_LH} (integer): Number of frequency samples of the resultant lag-hologram.
+\item {\bf samples\_depth\_LH} (integer): Number of depths samples of the resultant lag-hologram (it has to be equal than {\bf samples\_freq\_LH}).
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf freq\_LH} (double, array of {\bf samples\_freq\_LH} elements): Interferometric frequencies (in cycles/degree of elevation units) of the resultant lag-hologram (obtained from a simulated waveforms cluster) for the characterized scenario.
+\item {\bf depth\_LH} (double, array of {\bf samples\_freq\_LH} elements): Depths (in meters) of the resultant lag-hologram (obtained from a simulated waveforms cluster) for the characterized scenario.
+\end{itemize}
+
+
+\subsection{compute\_pow\_linearPol}
+
+Compute the relative received power (not waveforms) assuming an incoming signal (with power~=~1 at the surface level) at a given frequency and linear polarizations for the characterized scenario.\\
+
+Example:\\
+
+\texttt{[pow\_H, pow\_V] = my\_model\_layers.compute\_pow\_linearPol(elevation, azimuth, freq)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf elevation} (double): Elevation of the incident signal at the surface level in degrees.
+\item {\bf azimuth} (double): Azimuth of the incident signal at the surface level in degrees.
+\item {\bf freq} (double): Frequency of the incident signal in Hz.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf pow\_H} (double): Relative received power at horizontal polarization.
+\item {\bf pow\_V} (double): Relative received power at vertical polarization.
+\end{itemize}

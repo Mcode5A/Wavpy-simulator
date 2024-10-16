@@ -1,0 +1,486 @@
+\chapter{Waveform\_power}\label{cha:wav}
+
+This class provides means to analyze and characterize power (real values) GNSS+R waveforms.\\
+
+Example of object construction with arbitrary name {\it my\_wav}:\\
+
+\texttt{my\_wav = wavpy.Waveform\_power()}\\
+
+In this case, public variables and functions from object {\it my\_wav} of class {\it Waveform\_power} can be respectively checked/modified or called with:\\
+
+\texttt{my\_wav.variable}\\
+
+\texttt{my\_wav.function()}\\
+
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf positionMax} (double): Range position of waveform's peak (computed by means of a linear fit at the first waveform's derivative) in meters. Default value: 0.0
+
+\item {\bf posSampleMax} (double): Range position of waveform's peak (computed by taking the maximum sample value of the interpolated waveform) in meters. Default value: 0.0
+
+\item {\bf sigma\_posMax} (double): Formal standard deviation of the position of the waveform's peak (as a result of the linear fir applied) in meters. Default value: -1.0
+
+\item {\bf powerMax} (double): Waveform's peak power (computed by taking the maximum sample value of the interpolated waveform) in the stored waveform's units. Default value: 0.0
+
+\item {\bf positionDer} (double): Range position of waveform's peak derivative (computed by means of a linear fit at the second waveform's derivative) in meters. Default value: 0.0
+
+\item {\bf posSampleDer} (double): Range position of waveform's peak derivative (computed by taking the maximum sample value of the interpolated waveform's first derivative) in meters. Default value: 0.0
+
+\item {\bf sigma\_posDer} (double): Formal standard deviation of the position of the waveform's peak derivative (as a result of the linear fir applied) in meters. Default value: -1.0
+
+\item {\bf power\_posDer} (double): Waveform's power at position of maximum's first derivative (computed by taking the corresponding sample value of the interpolated waveform) in the stored waveform's units. Default value: 0.0
+
+\item {\bf powerDer\_posDer} (double): Waveform's first derivative power at position of maximum's first derivative (computed by taking the corresponding sample value of the interpolated waveform) in the stored waveform's units divided by meters. Default value: 0.0
+
+\item {\bf floorNoise} (double): Waveform's noise level (computed by averaging the first samples) in the stored waveform's units. Default value: 0.0
+
+\item {\bf positionRel} (double): Range position of waveform's peak multiplied by {\bf rel\_factor} at the leading edge (computed by means of a linear fit at the waveform) in meters. Default value: 0.0
+
+\item {\bf posSampleRel} (double): Range position of waveform's peak multiplied by {\bf rel\_factor} at the leading edge (computed by taking the corresponding sample value of the interpolated waveform) in meters. Default value: 0.0
+
+\item {\bf sigma\_posRel} (double): Formal standard deviation of the position of waveform's peak multiplied by {\bf rel\_factor} at the leading edge (as a result of the linear fir applied) in meters. Default value: -1.0
+
+\item {\bf slope\_normTail} (double): Slope of the trailing edge of the normalized waveform (computed by means of a linear fit at the waveform) in meters$^{-1}$. Default value: 0.0
+
+\item {\bf sigma\_slope\_normTail} (double): Formal standard deviation of the slope of the trailing edge of the normalized waveform (as a result of the linear fir applied) in meters$^{-1}$. Default value: -1.0
+\end{itemize}
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf waveform} (double, array of {\bf wav\_length} elements): Stored power waveform in the given units. Default value: void
+
+\item {\bf wav\_length} (integer): Number of samples of stored waveform. Default value: 0
+
+\item {\bf tail\_factor} (integer): Integer factor (to be multiplied by {\bf wav\_length}) used to compute the extended length of the waveform for connecting both ends before FFT-based interpolation. Default value: 1
+
+\item {\bf noise\_lags} (integer): Number of lags, starting from zero, employed to compute the noise floor. Default value: 0
+
+\item {\bf tail\_lags} (integer): Number of lags employed to extrapolate the tail of the waveform until the noise floor. Default value: 0
+
+\item {\bf sampling\_rate} (double): Sampling rate of the waveform in samples/sec. Default value: 20000000.0
+
+\item {\bf rel\_factor} (double): Scaling factor used for the computation of the relative delay located at the leading edge with a power equal to the product of such factor with the peak of the waveform. Default value: 0.5
+
+\item {\bf init\_range} (double): Initial range value of the stored waveform in meters. Default value: 0.0
+
+\item {\bf min\_resolution\_fft\_interp} (double): Minimum range resolution of the FFT interpolation for the computation of the delays in meters. Default value: 0.15
+
+\item {\bf fit\_length} (double): Range length of the segment employed for the linear fitting when computing the delays in meters. Default value: 10.0
+
+\item {\bf normTail\_length} (double): Range length of the segment employed for the linear fitting when computing the slope of the trailing edge in meters. Default value: 50.0
+\end{itemize}
+
+\section{Functions}
+
+\subsection{set\_waveform}
+
+Set a power waveform.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_waveform(wav\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_in} (double, array of N elements): Power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{set\_float\_waveform}
+
+Set a power waveform of type float.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_float\_waveform(wav\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_in} (double, array of N elements): Power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{set\_norm\_waveform}
+
+Set a normalized power waveform of type float.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_norm\_waveform(norm\_wav\_in, max\_val)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf norm\_wav\_in} (double, array of N elements): Normalized power waveform.
+\item {\bf max\_val} (double): Maximum value of the corresponding de-normalized waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{set\_amp\_waveform}
+
+Set a power waveform from in-phase and quadrature amplitude components.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_amp\_waveform(wav\_i\_in, wav\_q\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_i\_in} (double, array of N elements): Amplitude waveform (in-phase component) in arbitrary units.
+\item {\bf wav\_q\_in} (double, array of N elements): Amplitude waveform (quadrature component) in arbitrary units.
+\end{itemize}
+
+
+\subsection{get\_waveform}
+
+Get the stored power waveform.\\
+
+Example:\\
+
+\texttt{wav\_out = my\_wav.get\_waveform(wav\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_len} (integer): Number of samples of the stored waveform (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wav.get\_wav\_length()} as {\bf wav\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_out} (double, array of {\bf wav\_len} elements): Power waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{add\_waveform\_retracking}
+
+Update the stored waveform by weighty averaging its values with an input waveform after being re-tracked a given delay (by means of FFT).\\
+
+Example:\\
+
+\texttt{my\_wav.add\_waveform\_retracking(wav\_in, retrack\_delay, wav\_weight)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_in} (double, array of N elements): Power waveform in arbitrary units.
+\item {\bf retrack\_delay} (double): Retracking delay applied to {\bf wav\_in} before being averaged with the stored waveform in meters.
+\item {\bf wav\_weight} (double): Weight applied to {\bf wav\_in} for its averaging with the stored waveform. 
+\end{itemize}
+
+A more clear explanation:\\
+
+new\_stored\_waveform[range] = (1.0 - {\bf wav\_weight}) * {\bf waveform}[range] + {\bf wav\_weight} * {\bf wav\_in}[range - {\bf retrack\_delay}]
+
+
+\subsection{set\_sampling\_rate}
+
+Set the sampling rate of the stored waveform.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_sampling\_rate(sampling\_rate\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf sampling\_rate\_in} (double): Sampling rate of the waveform in samples/sec.
+\end{itemize}
+
+
+\subsection{set\_rel\_factor}
+
+Set the scaling factor used for the computation of the relative delay located at the leading edge with a power equal to the product of such factor with the peak of the waveform.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_rel\_factor(factor\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf factor\_in} (double): Scaling factor used for the computation of the relative delay located at the leading edge with a power equal to the product of such factor with the peak of the waveform.
+\end{itemize}
+
+
+\subsection{get\_rel\_factor}
+
+Get the scaling factor used for the computation of the relative delay located at the leading edge with a power equal to the product of such factor with the peak of the waveform.\\
+
+Example:\\
+
+\texttt{factor\_out = my\_wav.get\_rel\_factor()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf factor\_out} (double): Scaling factor used for the computation of the relative delay located at the leading edge with a power equal to the product of such factor with the peak of the waveform.
+\end{itemize}
+
+
+\subsection{set\_min\_resolution\_fft\_interp}
+
+Set the minimum range resolution of the FFT interpolation for the computation of the delays.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_min\_resolution\_fft\_interp(resolution\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf resolution\_in} (double): Minimum range resolution of the FFT interpolation for the computation of the delays in meters.
+\end{itemize}
+
+
+\subsection{set\_fit\_length}
+
+Set the range length of the segment employed for the linear fitting when computing the delays.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_fit\_length(fit\_length\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf fit\_length\_in} (double): Range length of the segment employed for the linear fitting when computing the delays in meters.
+\end{itemize}
+
+
+\subsection{set\_normtail\_length}
+
+Set range length of the segment employed for the linear fitting when computing the slope of the trailing edge in meters.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_normtail\_length(normtail\_length\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf normtail\_length\_in} (double): Range length of the segment employed for the linear fitting when computing the slope of the trailing edge in meters.
+\end{itemize}
+
+
+\subsection{set\_tail\_factor}
+
+Set factor to increase waveform's length with the purpose of connecting both ends during computation of delays.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_tail\_factor(tail\_factor\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf tail\_factor\_in} (integer): Integer factor (to be multiplied by {\bf wav\_length}) used to compute the extended length of the waveform for connecting both ends before FFT-based interpolation.
+\end{itemize}
+
+
+\subsection{set\_noise\_lags}
+
+Set the number of lags employed to compute the noise floor.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_noise\_lags(noise\_lags\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf noise\_lags\_in} (integer): Number of lags, starting from zero, employed to compute the noise floor.
+\end{itemize}
+
+
+\subsection{set\_tail\_lags}
+
+Set the number of lags employed to extrapolate the tail of the waveform until the noise floor.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_tail\_lags(tail\_lags\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf tail\_lags\_in} (integer): Number of lags employed to extrapolate the tail of the waveform until the noise floor.
+\end{itemize}
+
+
+\subsection{compute\_delays}
+
+Compute the delays that characterize the stored waveform based on {\bf [Rius et al, 10]}. It updates the contents of all the public variables.\\
+
+Example:\\
+
+\texttt{my\_wav.compute\_delays()}\\
+
+
+\subsection{compute\_delays\_wspeckle}
+
+Compute the delays that characterize the stored waveform based on {\bf [Rius et al, 10]}. It updates the contents of all the public variables. The difference with \texttt{compute\_delays()} is that in this case the standard deviations resulting from the linear fits are computed with weights for each sample.\\
+
+Example:\\
+
+\texttt{my\_wav.compute\_delays\_wspeckle(num\_incoh)}
+
+Input variables:
+\begin{itemize}
+\item {\bf num\_incoh} (integer): Number of incoherent integration samples.
+\end{itemize}
+
+
+\subsection{compute\_delays\_wlimits}
+
+Compute the delays that characterize the stored waveform based on {\bf [Rius et al, 10]} after applying range limits. It updates the contents of all the public variables. This function is recommended for those cases where the waveform shows unexpected fluctuations or has complex autocorrelation function shapes (such as Galileo signals).\\
+
+Example:\\
+
+\texttt{my\_wav.compute\_delays\_wlimits(limits\_center, limits\_width, apriori\_scattdel)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf limits\_center} (double): Central range location for limiting the search of the waveform's maximum derivative in meters.
+\item {\bf limits\_width} (double): Range interval around {\bf limits\_center} and {\bf limits\_center} + {\bf apriori\_scattdel} for limiting the search of waveform's maximum derivative and waveform's peak respectively. Meter units. 
+\item {\bf apriori\_scattdel} (double): A-priori estimation of the range distance between waveform's maximum derivative and waveform's peak used for limiting the search of the position of the peak. Meter units.
+\end{itemize}
+
+
+\subsection{compute\_delays\_wlimits\_LPF}
+
+Compute the delays that characterize the stored waveform based on {\bf [Rius et al, 10]} after applying range limits and a box low-pass filter. It updates the contents of all the public variables. This function is recommended for those cases where the waveform shows unexpected fluctuations or has complex autocorrelation function shapes (such as Galileo signals).\\
+
+Example:\\
+
+\texttt{my\_wav.compute\_delays\_wlimits\_LPF(limits\_center, limits\_width, apriori\_scattdel, bandwidth\_LPF\_Hz)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf limits\_center} (double): Central range location for limiting the search of the waveform's maximum derivative in meters.
+\item {\bf limits\_width} (double): Range interval around {\bf limits\_center} and {\bf limits\_center} + {\bf apriori\_scattdel} for limiting the search of waveform's maximum derivative and waveform's peak respectively. Meter units. 
+\item {\bf apriori\_scattdel} (double): A-priori estimation of the range distance between waveform's maximum derivative and waveform's peak used for limiting the search of the position of the peak. Meter units.
+\item {\bf bandwidth\_LPF\_Hz} (double): Bandwidth of the low-pass filter applied. Hz units.
+\end{itemize}
+
+
+\subsection{set\_init\_range}
+
+Set the initial range value of the stored waveform.\\
+
+Example:\\
+
+\texttt{my\_wav.set\_init\_range(init\_range\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf init\_range\_in} (double): Initial range value of the stored waveform in meters.
+\end{itemize}
+
+
+\subsection{get\_range\_waveform}
+
+Get the range of the stored waveform.\\
+
+Example:\\
+
+\texttt{range\_wav = my\_wav.get\_range\_waveform(range\_len)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf range\_len} (integer): Number of samples of the waveform stored (it has to be equal to {\bf wav\_length}). Recommendation: use \texttt{my\_wav.get\_wav\_length()} as {\bf range\_len}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf range\_wav} (integer, array of {\bf range\_len} elements): Range of the stored waveform in meters.
+\end{itemize}
+
+
+\subsection{get\_size\_deriv\_waveform\_tracks}
+
+Get size (number of samples) of the intervals where the fits are applied on first and second waveform's derivatives.\\
+
+Example:\\
+
+\texttt{size\_deriv = my\_wav.get\_size\_deriv\_waveform\_tracks()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf size\_deriv} (integer): Number of samples of the intervals where the fits are applied on first and second waveform's derivatives.
+\end{itemize}
+
+
+\subsection{get\_deriv\_waveform\_tracks}
+
+Get the intervals where the fits are applied (around specular delay) from waveform and its first and second derivatives after computing relevant delay positions and power levels.\\
+
+Example:\\
+
+\texttt{[tau\_der, wav\_der, wav\_der1, wav\_der2] = my\_wav.get\_deriv\_waveform\_tracks(size\_tau\_der, size\_wav\_der, size\_wav\_der1, size\_wav\_der2)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf size\_tau\_der} (integer): Number of samples of range interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_tau\_der}.
+\item {\bf size\_wav\_der} (integer): Number of samples of waveform interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der}.
+\item {\bf size\_wav\_der1} (integer): Number of samples of waveform's first derivative interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der1}.
+\item {\bf size\_wav\_der2} (integer): Number of samples of waveform's second derivative interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der2}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf tau\_der} (double, array of {\bf size\_deriv} elements): Range of the waveform and its first and second derivatives for the interval around the specular delay.
+\item {\bf wav\_der} (double, array of {\bf size\_deriv} elements): Waveform interval around the specular delay where the fits are applied.
+\item {\bf wav\_der1} (double, array of {\bf size\_deriv} elements): Waveform's first derivative interval around the specular delay where the fits are applied.
+\item {\bf wav\_der2} (double, array of {\bf size\_deriv} elements): Waveform's second derivative interval around the specular delay where the fits are applied.
+\end{itemize}
+
+
+\subsection{get\_deriv\_waveform\_tracks\_wlimits}
+
+Get the intervals where the fits are applied (around specular delay) from waveform and its first and second derivatives after computing relevant delay positions and power levels after applying limits.\\
+
+Example:\\
+
+\texttt{[tau\_der, wav\_der, wav\_der1, wav\_der2] = my\_wav.get\_deriv\_waveform\_tracks\_wlimits(limits\_center, limits\_width, apriori\_scattdel, size\_tau\_der, size\_wav\_der, size\_wav\_der1, size\_wav\_der2)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf limits\_center} (double): Center location of the range interval to constraint the initial estimation of the specular delay in meters.
+\item {\bf limits\_width} (double): Range interval around {\bf limits\_center} to constraint the initial estimation of the specular delay in meters.
+\item {\bf apriori\_scattdel} (double): A-priori estimation of the scatterometric delay (delay distance from specular to peak of the waveform) in meters.
+\item {\bf size\_tau\_der} (integer): Number of samples of range interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_tau\_der}.
+\item {\bf size\_wav\_der} (integer): Number of samples of waveform interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der}.
+\item {\bf size\_wav\_der1} (integer): Number of samples of waveform's first derivative interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der1}.
+\item {\bf size\_wav\_der2} (integer): Number of samples of waveform's second derivative interval (it has to be equal to {\bf size\_deriv}). Recommendation: use \texttt{my\_wav.get\_size\_deriv\_waveform\_tracks()} as {\bf size\_wav\_der2}.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf tau\_der} (double, array of {\bf size\_deriv} elements): Range of the waveform and its first and second derivatives for the interval around the specular delay.
+\item {\bf wav\_der} (double, array of {\bf size\_deriv} elements): Waveform interval around the specular delay where the fits are applied.
+\item {\bf wav\_der1} (double, array of {\bf size\_deriv} elements): Waveform's first derivative interval around the specular delay where the fits are applied.
+\item {\bf wav\_der2} (double, array of {\bf size\_deriv} elements): Waveform's second derivative interval around the specular delay where the fits are applied.
+\end{itemize}
+
+
+\subsection{dump\_norm\_waveform}
+
+Print the normalized power waveform stored.\\
+
+Example:\\
+
+\texttt{my\_wav.dump\_norm\_waveform()}\\
+
+
+\subsection{dump\_delays}
+
+Print the information of the delays computed from the power waveform stored.\\
+
+Example:\\
+
+\texttt{my\_wav.dump\_delays()}\\
+
+
+\subsection{get\_wav\_length}
+
+Get the number of samples of the waveform stored.\\
+
+Example:\\
+
+\texttt{wav\_len\_out = my\_wav.get\_wav\_length()}\\
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_len\_out} (integer): Number of samples of the waveform stored.
+\end{itemize}

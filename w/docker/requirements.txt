@@ -1,0 +1,18 @@
+apt-utils
+cmake
+g++
+gfortran
+libgsl23
+libgsl-dev
+libfftw3-bin
+libfftw3-dev
+libboost-test1.65.1
+libboost-test1.65-dev
+doxygen
+graphviz
+libboost-python1.65.1
+libboost-python1.65-dev
+python-matplotlib
+python-numpy
+python3-dev
+>>>>>>> version_3.0

@@ -1,0 +1,8 @@
+
+
+
+swig -c++ -python wavpy.i
+
+g++ -fPIC -c wavpy_wrap.cxx -o wavpy_wrap.o -I/usr/include/python2.7
+
+g++ -shared -DLOCAL_DATA_PATH=\"../src/waveform_pylib/src/data_share/\" wavpy_wrap.o ../src/waveform_complex.o ../src/waveform_power.o ../src/recipes_f90/.libs/nrtype.o ../src/recipes_f90/.libs/nr.o ../src/recipes_f90/.libs/nrutil.o ../src/recipes_f90/.libs/rtsafe.o  ../src/recipes_f90/.libs/realft.o ../src/recipes_f90/.libs/lfit.o ../src/recipes_f90/.libs/covsrt.o ../src/recipes_f90/.libs/gaussj.o ../src/recipes_f90/.libs/four1.o ../src/recipes_f90/.libs/fourrow.o ../src/.libs/Fit_utilities.o ../src/.libs/Compute_delays.o ../src/ancillary_functions.o ../src/rf_front_end.o ../src/gnss_composite.o ../src/specular_geometry.o ../src/reflecting_surface.o ../src/.libs/Surface_routines.o ../src/ZavorotnyVoronovichModel.o -lgsl -lgslcblas -lm -lgfortran -lstdc++ -o _wavpy.so

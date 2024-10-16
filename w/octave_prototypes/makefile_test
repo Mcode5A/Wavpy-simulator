@@ -1,0 +1,10 @@
+testsurf: testsurf.o seasurfaceFFTphase.o 
+	gfortran -o testsurf testsurf.o  seasurfaceFFTphase.o
+
+testsurf.o: testsurf.f90
+	gfortran -c testsurf.f90 math_func.inc
+
+seasurfaceFFTphase.o: seasurfaceFFTphase.f90
+	gfortran -c seasurfaceFFTphase.f90 math_func.inc
+
+

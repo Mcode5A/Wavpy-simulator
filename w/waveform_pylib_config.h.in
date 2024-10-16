@@ -1,0 +1,4 @@
+// the configured options and settings for waveform_pylib
+#define waveform_pylib_VERSION_MAJOR @waveform_pylib_VERSION_MAJOR@
+#define waveform_pylib_VERSION_MINOR @waveform_pylib_VERSION_MINOR@
+#define LOCAL_DATA_PATH              "@CMAKE_INSTALL_DATADIR@"

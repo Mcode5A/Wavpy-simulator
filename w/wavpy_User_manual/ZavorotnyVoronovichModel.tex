@@ -1,0 +1,281 @@
+\chapter{ZaVoModel\_GNSSR}\label{cha:ZVmodel}
+
+This class models GNSS-R waveforms and DDM's based on {\bf [Zavorotny and Voronovich, 00]} and their corresponding covariance matrix based on {\bf [Li et al, 17]}, which allows the simulation of realistic noise (thermal and speckle) realizations with a proper statistical characterization in both range and Doppler domains.\\
+
+Example of object construction with arbitrary name {\it my\_model}:\\
+
+\texttt{my\_model = wavpy.ZaVoModel\_GNSSR()}\\
+
+In this case, public variables (including objects) and functions from object {\it my\_model} of class {\it ZaVoModel\_GNSSR} can be respectively checked/modified or called with:\\
+
+\texttt{my\_model.variable}\\
+
+\texttt{my\_model.function()}\\
+
+\texttt{my\_model.object\_A.variable\_from\_object\_A}\\
+
+\texttt{my\_model.object\_A.function\_from\_object\_A()}\\
+
+\section{Additional information}
+
+{\bf Local frame}: The local frame is a Cartesian coordinates system with its origin at the specular point, X- and Y-axis defining the horizontal plane parallel to the surface, with the Y-axis pointing towards the transmitter, and the Z-axis pointing to Zenith by complying the right-hand rule.
+
+\section{Public variables}
+
+\begin{itemize}
+\item {\bf interferometric\_flag} (boolean): True - Computation of noise level based on the interferometric approach. False - Computation of noise level based on the clean-replica approach. Default value: False
+
+\item {\bf curvature\_approx\_flag} (boolean): True - Apply Earth curvature approximation when integrating the reflected power over the surface (recommended when the receiver is at high altitude). False - Apply planar reflected surface. Default value: False
+
+\item {\bf covariance\_wav\_flag} (boolean): True - Computation of mean waveform based on the covariance approach (the corresponding covariance matrix is also stored). False - Computation of mean waveform based on the regular approach (if {\bf covariance\_ddm\_flag} is also at False). Default value: False
+
+\item {\bf covariance\_ddm\_flag} (boolean): True - Computation of mean waveform and DDM based on the covariance approach (the corresponding covariance matrix is also stored). False - Computation of mean DDM based on the regular approach. Default value: False
+
+\item {\bf recompute\_Lambda\_flag} (boolean): True - Computation of autocorrelation function from {\bf gnss\_signal} before simulation. False - Use of already stored autocorrelation function in {\bf gnss\_signal} during simulation. Default value: True
+
+\item {\bf sigma0\_to\_one\_flag} (boolean): True - Computation of mean waveform or DDM by setting {\it sigma\_0} to 1. False - Computation of mean waveform or DDM based on the regular approach. Default value: False
+
+\item {\bf polarization} (char): Polarization of the reflected signal. Valid values: 'R' for RHCP and 'L' for LHCP. Default value: 'L'
+
+\item {\bf num\_angles} (integer): Number of integration points over the surface ellipse for each range sample. It determines the angular resolution of the surface integral during the simulation. Default value: 120
+
+\item {\bf wav\_length} (integer): Length of modelled waveform. Default value: 256
+
+\item {\bf ddm\_half\_dopplers} (integer): Number of additional Doppler slices. The total number of Doppler lines in the DDM will be: 2x {\bf ddm\_half\_dopplers} + 1. Default value: 0
+
+\item {\bf sampling\_rate} (double): Sampling rate of the modelled waveform in samples/sec. Default value: 80000000.0
+
+\item {\bf delta\_doppler} (double): Doppler increment between consecutive slices of the DDM in Hz. Default value: 0.0
+
+\item {\bf delta\_freq} (double): Doppler offset of the DDM in Hz. Default value: 0.0
+
+\item {\bf coherent\_integration} (double): Coherent integration time of the modelled waveform in secs. Default value: 0.001
+
+\item {\bf weight\_cohPower} (double): Weight applied to the coherent component of the reflected power. Default value: 0.0
+
+\item {\bf geometry} (object of class {\it Specular\_geometry}~[\ref{cha:geom}]): Object characterizing the geometry used during the simulation.
+
+\item {\bf surface} (object of class {\it Reflecting\_surface}~[\ref{cha:surf}]): Object characterizing the reflecting surface used during the simulation.
+
+\item {\bf receiver\_Up} (object of class {\it RF\_FrontEnd}~[\ref{cha:rffe}]): Object characterizing the up-looking receiver front-end (collecting direct GNSS signals) used during the simulation.
+
+\item {\bf receiver\_Down} (object of class {\it RF\_FrontEnd}~[\ref{cha:rffe}]): Object characterizing the down-looking receiver front-end (collecting reflected GNSS signals) used during the simulation.
+
+\item {\bf gnss\_signal} (object of class {\it GNSS\_composite}~[\ref{cha:gnss}]): Object characterizing the GNSS signal used during the simulation.
+
+\item {\bf waveform\_POW} (object of class {\it Waveform\_power}~[\ref{cha:wav}]): Object that stores the simulated waveform with functions for data analysis.
+\end{itemize}
+
+\section{Relevant private variables}
+
+\begin{itemize}
+\item {\bf dump\_isolines\_data} (boolean): True - Store a binary file containing information of range, Doppler, $\sigma_0$ and gain of the antenna over the surface. False - Do not store surface data. Default value: False
+
+\item {\bf stare\_processing\_flag} (boolean): True - Make simulation for a stare processing case, which will produce a DDM with a PDF of slopes set to 1. False - Make the simulation using the standard computation of the PDF of slopes. Default: False
+
+\item {\bf use\_transmitter\_eirp} (boolean): True - Use {\bf txr\_eirp} for the computation of transmitted power. False - Standard computation of transmitted power by applying the code weights in {\bf gnss\_signal} to the nominal values of the different code-components. Default: False
+
+\item {\bf double txr\_eirp} (double): Equivalent Isotropic Radiated Power (EIRP) in dB units employed for the computation of transmitted power when {\bf use\_transmitter\_eirp} is True. Default: 0.0
+
+\item {\bf isolines\_data\_namefile} (string): Name of the binary output file containing the information of range, Doppler, $\sigma_0$ and gain of the antenna over the surface when making the simulation. Default value: void
+
+\item {\bf stareProc\_data\_namefile} (string): Name of the text output file containing the information related to stare processing in an eight-columns format: range | Doppler | mean X-component of scattering vector | mean Y-component of scattering vector | mean Z-component of scattering vector | mean longitude | mean latitude | ambiguity status ("1" if there is no ambiguity, "0" else). Default value: void
+
+\item {\bf size\_ddm\_stored} (integer, array of 2 elements): Number of samples of the stored DDM without taking into account the central Doppler. Default value: [0, 0]
+
+\item {\bf ddm} (double, 2D array of {\bf size\_ddm\_stored[0]} x {\bf size\_ddm\_stored[1]} elements): Simulated power DDM. Default value: void
+
+\item {\bf len\_cov\_stored} (integer): Number of samples (single dimension) of the stored covariance. Default value: 0
+
+\item {\bf cov} (double, 2D array of {\bf len\_cov\_stored} x {\bf len\_cov\_stored} elements): Simulated waveform or DDM covariance. Default value: void
+
+\end{itemize}
+
+\section{Functions}
+
+\subsection{enable\_isolines\_data\_dump}
+
+Enable the storage of a binary file containing information of range, Doppler, $\sigma_0$ and gain of the antenna over the surface during the simulation.\\
+
+Example:\\
+
+\texttt{my\_model.enable\_isolines\_data\_dump(binfile)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf binfile} (string): Name of the binary output file containing the information of range, Doppler, $\sigma_0$ and gain of the antenna over the surface when making the simulation.
+\end{itemize}
+
+Additional information:\\
+
+The binary file contains blocks of 8 float numbers: [{\it x, y, lon, lat, tau, sigma\_0, gain, doppler}]. The first two elements ({\it x, y}) are a point location at the local frame in meters, ({\it lon, lat}) are the longitude and latitude coordinates in degrees of the location,  {\it tau} is the corresponding range in meters, {\it sigma\_0} is the $\sigma_0$ in dB at that point, {\it gain} is the projection of the receiver antenna in dB and {\it doppler} contains the corresponding Doppler frequency in Hz.\\
+
+The next lines show a python example on how to read the contents of file {\bf binfile} and load them into a set of numpy arrays:
+
+\verb|   |\\
+\verb|import numpy as np|\\
+\verb|   |\\
+\verb|data_surf = np.fromfile(binfile, dtype=np.float32)|\\
+\verb|x = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|y = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|lon = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|lat = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|tau = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|sigma_0 = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|gain = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|doppler = np.zeros(len(data_surf)/8, dtype=np.float32)|\\
+\verb|   |\\
+\verb|for index in range(len(data_surf)/8):|\\
+\verb|   x[index] = data_surf[index*8]|\\
+\verb|   y[index] = data_surf[index*8 + 1]|\\
+\verb|   lon[index] = data_surf[index*8 + 2]|\\
+\verb|   lat[index] = data_surf[index*8 + 3]|\\
+\verb|   tau[index] = data_surf[index*8 + 4]|\\
+\verb|   sigma_0[index] = data_surf[index*8 + 5]|\\
+\verb|   gain[index] = data_surf[index*8 + 6]|\\
+\verb|   doppler[index] = data_surf[index*8 + 7]|\\
+
+
+\subsection{disable\_isolines\_data\_dump}
+
+Disable the storage of a binary file containing information of range, Doppler, $\sigma_0$ and gain of the antenna over the surface during the simulation.\\
+
+Example:\\
+
+\texttt{my\_model.disable\_isolines\_data\_dump()}\\
+
+
+\subsection{set\_stare\_processing\_mode}
+
+Set simulation into stare processing mode. Under this coditions, the waveform/DDM is simulated by setting the PDF of the slopes to 1. In addition, a text file is stored with further information of the DDM process, such as mean scattering vector and ambiguity status of each delay-Doppler cell.\\
+
+Example:\\
+
+\texttt{my\_model.set\_stare\_processing\_mode(textfile)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf textfile} (string): Name of the text output file containing the information related to stare processing in an eight-columns format: (1) range, (2) Doppler, (3) mean X-component of scattering vector, (4) mean Y-component of scattering vector, (5) mean Z-component of scattering vector, (6) mean longitude, (7) mean latitude and (8) ambiguity status ("1" if there is no ambiguity, "0" else).
+\end{itemize}
+
+
+\subsection{unset\_stare\_processing\_mode}
+
+Unset the stare processing mode from the simulation.\\
+
+Example:\\
+
+\texttt{my\_model.unset\_stare\_processing\_mode()}\\
+
+
+\subsection{set\_transmitter\_EIRP}
+
+Use of a given value for the computation of transmitted power.\\
+
+Example:\\
+
+\texttt{my\_model.set\_transmitter\_EIRP(txr\_eirp\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf txr\_eirp\_in} (double): Equivalent Isotropic Radiated Power (EIRP) in dB units employed for the computation of transmitted power.
+\end{itemize}
+
+
+\subsection{unset\_transmitter\_EIRP}
+
+Unset the use of a previously loaded value for the computation of transmitted power. Then, such computation is made by applying the code weights in {\bf gnss\_signal} to the nominal values of the different code-components.\\
+
+Example:\\
+
+\texttt{my\_model.unset\_transmitter\_EIRP()}\\
+
+
+\subsection{compute\_waveform}
+
+Simulate the waveform and the DDM (if {\bf ddm\_half\_dopplers} and {\bf delta\_doppler} are greater than zero) for the given characterization.\\
+
+Example:\\
+
+\texttt{my\_model.compute\_waveform()}\\
+
+
+\subsection{get\_DDM\_doppler\_slice}
+
+Get a Doppler slice from the stored DDM (if it has been computed).\\
+
+Example:\\
+
+\texttt{ddm\_slice = my\_model.get\_DDM\_doppler\_slice(doppler\_index, range\_size)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf doppler\_index} (integer): Index of the Doppler slice (0 for the central frequency).
+\item {\bf range\_size} (integer): Number of range samples of the stored DDM (it has to be equal to {\bf size\_ddm\_stored[0]}).
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf ddm\_slice} (double, array of {\bf size\_ddm\_stored[0]} elements): Doppler slice from the stored DDM.
+\end{itemize}
+
+
+\subsection{get\_cov\_slice}
+
+Get a covariance matrix slice from the stored covariance (if it has been computed).\\
+
+Example:\\
+
+\texttt{cov\_slice = my\_model.get\_cov\_slice(cov\_index, range\_size)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf cov\_index} (integer): Index of the covariance slice.
+\item {\bf range\_size} (integer): Number of range samples of the stored covariance (it has to be equal to {\bf len\_cov\_stored}). For a waveform covariance, this number should be equal to the number of range samples of the corresponding waveform. In the case of a DDM, the previous number should be additionally multiplied by the number of Doppler samples.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf cov\_slice} (double, array of {\bf len\_cov\_stored} elements): Covariance slice from the stored covariance.
+\end{itemize}
+
+
+\subsection{get\_noisy\_waveform}
+
+Get a noisy waveform computed from the stored covariance and the mean waveform.\\
+
+Example:\\
+
+\texttt{wav\_out = my\_model.get\_noisy\_waveform(wav\_len, seed\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf wav\_len} (integer): Number of samples of the stored mean waveform (it has to be equal to {\bf wav\_length}). Recommendation: use\\ \texttt{my\_model.waveform\_POW.get\_wav\_length()}\\ as {\bf wav\_len}.
+\item {\bf seed\_in} (unsigned long integer): Seed used for the internal random Gaussian noise generator.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf wav\_out} (double, array of wav\_len elements): Power noisy waveform in arbitrary units.
+\end{itemize}
+
+
+\subsection{get\_noisy\_DDM}
+
+Get a noisy DDM computed from the stored covariance and the mean DDM.\\
+
+Example:\\
+
+\texttt{ddm\_out = my\_model.get\_noisy\_DDM(ddm\_len, seed\_in)}\\
+
+Input variables:
+\begin{itemize}
+\item {\bf ddm\_len} (integer): Number of samples of the stored mean DDM (it has to be equal to {\bf size\_ddm\_stored[0]} multiplied by {\bf size\_ddm\_stored[1] + 1}). Recommendation: use\\ \texttt{my\_model.waveform\_POW.get\_wav\_length()*(my\_model.ddm\_half\_dopplers*2 + 1)}\\ as {\bf ddm\_len}.
+\item {\bf seed\_in} (unsigned long integer): Seed used for the internal random Gaussian noise generator.
+\end{itemize}
+
+Output variables:
+\begin{itemize}
+\item {\bf ddm\_out} (double, array of ddm\_len elements): Power noisy DDM in arbitrary units. Recommendation: use\\ \texttt{ddm\_out.reshape((my\_model.ddm\_half\_dopplers*2 + 1), my\_model.wav\_length)}\\ to convert it into a 2-dimensional array.
+\end{itemize}
+
