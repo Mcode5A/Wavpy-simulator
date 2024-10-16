@@ -1,0 +1,21 @@
+
+hostname 
+#module unload gcc/8.2.0
+#module load intel/2021.3.0
+
+
+icpc -c -qopenmp -O3 SurfaceReflection.cpp -o SurfaceReflection.icc_compiled 
+
+
+#module load gcc/10.2.0
+#module load openmpi/3.0.0
+
+ 
+
+mpiCC  -c -O3 -lm -lmpi -fopenmp  -march=native -finline-functions global_main.cpp    SurfaceGeneration.cpp plot_semisphere.cpp  -lgsl  -lglut -lGLU -lGL -fno-math-errno
+
+
+mpiCC -o $1_linked_icc_SIMD_MPI.out SurfaceReflection.icc_compiled SurfaceGeneration.o plot_semisphere.o global_main.o  -lgsl   -lglut -lGLU -lGL -fopenmp
+
+
+time ./$1_linked_icc_SIMD_MPI.out

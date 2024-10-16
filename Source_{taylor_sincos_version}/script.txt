@@ -1,0 +1,18 @@
+
+hostname 
+#module unload gcc/8.2.0
+#module load gcc/10.2.0
+#module load openmpi/3.0.0
+
+ 
+
+mpiCC  -O3 -lm -lmpi -fopenmp  -march=native -finline-functions global_main.cpp   SurfaceReflection.cpp SurfaceGeneration.cpp plot_semisphere.cpp  -lgsl  -lglut -lGLU -lGL -fno-math-errno -o $1MPI.out
+
+
+time ./$1MPI.out 
+
+
+#perf stat ./$1.out 
+
+
+#perf record -o report.$1.data ./$1.out

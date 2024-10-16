@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH -N 4 #number of nodes
+#SBATCH  -n 4 #number of cores/tasks
+
+
+
+hostname 
+#module unload gcc/8.2.0
+#module load gcc/10.2.0
+#module load openmpi/3.0.0
+
+ 
+
+mpiCC  -O3 -lm -lmpi -fopenmp  -march=native -finline-functions global_main.cpp   SurfaceReflection.cpp SurfaceGeneration.cpp plot_semisphere.cpp  -lgsl  -lglut -lGLU -lGL -fno-math-errno -o $1MPI.out
+
+
+time mpirun  ./$1MPI.out 
